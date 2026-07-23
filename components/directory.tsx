@@ -1,6 +1,7 @@
 "use client";
 
 import { Info, LoaderCircle, Search, X } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   FormEvent,
@@ -156,9 +157,12 @@ export function Directory({
                 </button>
               )}
             </form>
-            <button className="request-company" type="button" onClick={() => openRequest()}>
-              Request a company
-            </button>
+            <div className="directory-actions">
+              <Link href="/compare">Compare companies</Link>
+              <button className="request-company" type="button" onClick={() => openRequest()}>
+                Request a company
+              </button>
+            </div>
           </div>
         </div>
 
