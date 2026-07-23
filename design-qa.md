@@ -155,4 +155,42 @@ The chart uses trailing seven-day totals, a four-week average for `/week`, and t
 
 The above-the-fold directory copy diff is empty. On Compare, the only new visible copy is the requested chart title and its compact legend. No actionable P0, P1, or P2 findings remain.
 
+## Velocity range follow-up
+
+### Evidence
+
+- Weekly company view: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/10-week-month-year-weekly.png`
+- Monthly company view: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/11-week-month-year-monthly.png`
+- Monthly company view at 390px: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/12-mobile-monthly.png`
+- Monthly comparison view at 390px: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/13-compare-mobile-monthly.png`
+- Browser method: Codex in-app browser.
+- Desktop viewport: 1440 × 900 CSS pixels at density 1.
+- Mobile viewport: 390 × 844 CSS pixels at density 1.
+- State: Vercel company activity and Vercel/Stripe comparison with live GitHub data.
+
+GitHub's commit-activity source provides approximately the latest 12 months. The implementation therefore reports an honest rolling 365-day total rather than implying that unavailable multi-year history exists.
+
+### Metric definitions
+
+- `/week`: average of the latest four complete seven-day totals.
+- `/month`: trailing 30-day commit total.
+- `/year`: trailing 365-day commit total.
+- `acceleration`: latest 30 days compared with the preceding 30 days.
+- Weekly bars: 12 trailing seven-day totals.
+- Monthly bars: commit totals grouped into the 12 available calendar months.
+
+### Fidelity ledger
+
+| Surface | Result |
+| --- | --- |
+| Typography | Existing section and data-label scales remain. The four headline metrics use the established compact stat hierarchy. |
+| Spacing and layout | One toolbar contains all four metrics and the Weekly/Monthly switch. The full-width chart remains an open band with no extra panel or explanation. |
+| Colour and tokens | Existing GitHub green, comparison blue, guide lines, borders, and active-control treatment are reused. |
+| Images and assets | No new decorative assets were added. All bars are semantic data UI generated from live activity. |
+| Copy and content | Additions are limited to `Weekly`, `Monthly`, `/week`, `/month`, `/year`, and `acceleration`. No subtitle or explainer copy was added. |
+| Responsiveness | Four KPIs, the range switch, and 12 monthly bars fit at 390px. Multi-company bars remain 620px wide inside a 332px touch scroller; document width remains 390px. |
+| Interaction | Weekly and Monthly controls were exercised in company and comparison views. Comparison horizontal scroll reached 288px. |
+
+The directory's above-the-fold copy remains unchanged. Browser consoles contained no warnings or errors, and no actionable P0, P1, or P2 findings remain.
+
 final result: passed

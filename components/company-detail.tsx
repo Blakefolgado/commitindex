@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { formatCompactNumber, formatMomentum } from "@/lib/analytics";
 import { ContributionGrid, type Period } from "@/components/contribution-grid";
 import { ShareButton } from "@/components/share-button";
-import { getRecentWeeklyAverage, VelocityChart } from "@/components/velocity-chart";
+import { VelocityChart } from "@/components/velocity-chart";
 import type { ContributorsPayload, OrganizationActivity } from "@/lib/types";
 
 function formatDate(date: string) {
@@ -108,15 +108,9 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
       <section className="velocity-panel" aria-labelledby="velocity-heading">
         <div className="velocity-heading">
           <h2 id="velocity-heading">Velocity</h2>
-          <div className="velocity-summary">
-            <strong>{formatCompactNumber(getRecentWeeklyAverage(data.activity))}<small>/week</small></strong>
-            <span className={data.stats.momentum >= 0 ? "positive" : "negative"}>
-              {formatMomentum(data.stats.momentum)} momentum
-            </span>
-          </div>
         </div>
         <VelocityChart
-          ariaLabel={`${data.name} weekly commit velocity over the last 12 weeks`}
+          ariaLabel={`${data.name} commit velocity`}
           series={[{
             activity: data.activity,
             momentum: data.stats.momentum,

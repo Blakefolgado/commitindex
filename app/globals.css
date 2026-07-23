@@ -951,7 +951,7 @@ footer > span {
   align-items: center;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .velocity-heading h2,
@@ -961,10 +961,18 @@ footer > span {
   margin: 0;
 }
 
-.velocity-summary {
-  align-items: baseline;
+.velocity-toolbar {
+  align-items: flex-end;
   display: flex;
-  gap: 14px;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.velocity-summary {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(4, auto);
 }
 
 .velocity-summary strong {
@@ -973,16 +981,52 @@ footer > span {
   letter-spacing: -0.02em;
 }
 
-.velocity-summary strong small {
+.velocity-summary > span {
+  display: grid;
+  gap: 1px;
+}
+
+.velocity-summary small {
   color: var(--muted);
   font-size: 10px;
   font-weight: 450;
-  margin-left: 2px;
 }
 
-.velocity-summary > span {
-  font-size: 11px;
-  font-weight: 600;
+.velocity-summary > span.positive small,
+.velocity-summary > span.negative small {
+  color: inherit;
+}
+
+.velocity-resolution {
+  display: flex;
+}
+
+.velocity-resolution button {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  min-height: 28px;
+  padding: 0 10px;
+}
+
+.velocity-resolution button:first-child {
+  border-radius: 5px 0 0 5px;
+}
+
+.velocity-resolution button:last-child {
+  border-left: 0;
+  border-radius: 0 5px 5px 0;
+}
+
+.velocity-resolution button:hover,
+.velocity-resolution button.active {
+  color: var(--text);
+}
+
+.velocity-resolution button.active {
+  background: #21262d;
 }
 
 .velocity-chart,
@@ -1071,7 +1115,6 @@ footer > span {
   display: flex;
   flex-wrap: wrap;
   gap: 9px 20px;
-  margin-bottom: 13px;
 }
 
 .velocity-legend > span {
@@ -2014,10 +2057,23 @@ footer > span {
     gap: 10px;
   }
 
-  .velocity-summary {
-    align-items: flex-end;
+  .velocity-toolbar {
+    align-items: stretch;
     flex-direction: column;
-    gap: 2px;
+    gap: 10px;
+  }
+
+  .velocity-summary {
+    gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .velocity-summary strong {
+    font-size: 16px;
+  }
+
+  .velocity-resolution {
+    align-self: flex-start;
   }
 
   .comparison-velocity {

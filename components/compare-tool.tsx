@@ -273,7 +273,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
             <h2 id="comparison-velocity-heading">Velocity</h2>
           </div>
           <VelocityChart
-            ariaLabel={`Weekly commit velocity for ${loadedItems.map((item) => item.name).join(", ")}`}
+            ariaLabel={`Commit velocity for ${loadedItems.map((item) => item.name).join(", ")}`}
             series={loadedItems.map((item) => ({
               activity: item.activity,
               momentum: item.stats.momentum,
