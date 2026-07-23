@@ -850,6 +850,7 @@ footer > span {
 }
 
 .leaderboard-shell {
+  max-width: 1180px;
   overflow-x: clip;
 }
 
@@ -1412,12 +1413,15 @@ footer > span {
 }
 
 .leaderboard-table {
-  min-width: 1280px;
+  min-width: 1040px;
+  table-layout: fixed;
 }
 
 .leaderboard-table td {
-  padding-bottom: 5px;
-  padding-top: 5px;
+  height: 68px;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  vertical-align: middle;
 }
 
 .leaderboard-table tbody tr {
@@ -1432,20 +1436,48 @@ footer > span {
 .leaderboard-table td:first-child {
   font-size: 15px;
   font-weight: 650;
-  width: 58px;
 }
 
-.leaderboard-table td:nth-child(n + 4):nth-child(-n + 7) {
+.leaderboard-table th:nth-child(n + 4):nth-child(-n + 6),
+.leaderboard-table td:nth-child(n + 4):nth-child(-n + 6) {
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
-.leaderboard-table td.positive,
-.leaderboard-table td.negative {
-  align-items: center;
-  display: flex;
-  gap: 3px;
-  justify-content: flex-end;
+.leaderboard-col-rank {
+  width: 52px;
+}
+
+.leaderboard-col-company {
+  width: 180px;
+}
+
+.leaderboard-col-activity {
+  width: 164px;
+}
+
+.leaderboard-col-commits {
+  width: 90px;
+}
+
+.leaderboard-col-days {
+  width: 82px;
+}
+
+.leaderboard-col-consistency {
+  width: 88px;
+}
+
+.leaderboard-col-momentum {
+  width: 112px;
+}
+
+.leaderboard-col-repo {
+  width: 222px;
+}
+
+.leaderboard-col-compare {
+  width: 50px;
 }
 
 .leader-company {
@@ -1458,32 +1490,52 @@ footer > span {
 .leader-company img {
   border: 1px solid var(--border);
   border-radius: 6px;
-  height: 26px;
-  width: 26px;
+  height: 30px;
+  width: 30px;
 }
 
-.leader-company span {
-  display: flex;
-  flex-direction: column;
-}
-
-.leader-company small {
-  color: var(--muted);
-  font-size: 9px;
-  margin-top: 2px;
+.leader-company strong,
+.leader-repo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mini-heatmap {
   display: grid;
-  gap: 1px;
+  gap: 2px;
   grid-auto-flow: column;
-  grid-template-rows: repeat(7, 3px);
+  grid-template-rows: repeat(7, 7px);
+  width: max-content;
 }
 
 .mini-heatmap i {
-  border-radius: 1px;
-  height: 3px;
-  width: 3px;
+  border: 1px solid rgba(240, 246, 252, 0.04);
+  border-radius: 2px;
+  height: 7px;
+  width: 7px;
+}
+
+.momentum-sparkline {
+  color: var(--muted);
+  display: block;
+  height: 30px;
+  margin-left: auto;
+  width: 96px;
+}
+
+.momentum-sparkline polygon {
+  fill: currentColor;
+  opacity: 0.1;
+}
+
+.momentum-sparkline polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
 }
 
 .field-notes {

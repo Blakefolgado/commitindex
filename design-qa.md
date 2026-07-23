@@ -268,4 +268,45 @@ The directory's above-the-fold copy remains unchanged. Browser consoles containe
 
 The directory's above-the-fold copy remains unchanged. Browser consoles contained no warnings or errors. Direct comparison of the accepted visual system and latest implementation found no actionable P0, P1, or P2 mismatch.
 
+## Leaderboard density follow-up
+
+### Evidence
+
+- User-reported state: `/var/folders/pn/y6tmtkw91nd2n89bldb2qjl40000gn/T/TemporaryItems/NSIRD_screencaptureui_PDuRyn/Screenshot 2026-07-23 at 19.21.56.png`
+- Desktop leaderboard: `/Users/blakefolgado/.codex/tmp/open-office-leaderboard-qa-2026-07-23/leaderboards-table.png`
+- Mobile leaderboard: `/Users/blakefolgado/.codex/tmp/open-office-leaderboard-qa-2026-07-23/leaderboards-mobile.png`
+- Browser method: Codex in-app browser.
+- Desktop viewports: 1440 × 900 and the reported 1182 × 900 CSS pixels.
+- Mobile viewport: 390 × 844 CSS pixels.
+- State: default commit leaderboard with live GitHub snapshot data.
+
+### Comparison history
+
+- P1: The 1280px table minimum forced horizontal scrolling at the reported desktop width and let low-information metric columns consume too much space.
+  - Fix: Replaced automatic column sizing with a 1040px content-aware column map and capped the leaderboard shell at 1180px.
+  - Recheck: At 1182px, the 1118px table and wrapper match exactly with no internal overflow. Metric columns range from 82px to 120px.
+- P1: The 3px activity cells were too small to read.
+  - Fix: Increased the 16-week grid to 7px cells with 2px gaps.
+  - Recheck: Each grid measures 142 × 61px and remains unchanged at mobile width.
+- P1: Momentum used directional arrows and signed percentages instead of showing the underlying trend.
+  - Fix: Replaced the number with a 96 × 30px, 12-week line and area sparkline.
+  - Recheck: Ten visible rows render ten sparklines. Exact 30-day momentum remains in each chart's accessible name and title.
+- P2: Company handles added a second line without improving leaderboard scanning.
+  - Fix: Reduced the company cell to avatar and company name.
+  - Recheck: Rows measure 70px while preserving a materially larger activity grid.
+
+### Fidelity ledger
+
+| Surface | Result |
+| --- | --- |
+| Typography | Existing table hierarchy and tabular numerals remain; company names now use one line. |
+| Spacing and layout | Explicit content-sized columns remove the stretched appearance. Rows are compact around the larger data graphic. |
+| Colour and tokens | GitHub contribution greens and existing positive/negative tokens drive the two chart types. |
+| Images and assets | No decorative assets were added. Avatars remain the only images. |
+| Copy and content | No subtitle or explainer was added. Existing headers and filters remain. |
+| Responsiveness | The full table fits at 1182px. At 390px it stays inside a 352px touch scroller; body width remains 390px and window-level horizontal scroll stays locked at zero. |
+| Interaction | The table scroll reaches the momentum and repository columns on mobile. Every sparkline exposes its exact momentum through accessible text. |
+
+The above-the-fold copy remains unchanged. The local server returned the leaderboard with HTTP 200 and no terminal errors. Direct comparison with the reported screenshot found no remaining actionable P0, P1, or P2 issue.
+
 final result: passed
