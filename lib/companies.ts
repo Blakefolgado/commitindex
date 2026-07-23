@@ -1,5 +1,4 @@
 export type Category =
-  | "Featured"
   | "AI"
   | "Developer tools"
   | "Infrastructure"
@@ -15,13 +14,13 @@ export type Company = {
 };
 
 export const companies: Company[] = [
-  { org: "vercel", name: "Vercel", category: "Featured", description: "Frontend cloud" },
-  { org: "stripe", name: "Stripe", category: "Featured", description: "Financial infrastructure" },
-  { org: "github", name: "GitHub", category: "Featured", description: "Developer platform" },
-  { org: "supabase", name: "Supabase", category: "Featured", description: "Open source backend" },
-  { org: "linear", name: "Linear", category: "Featured", description: "Product development" },
-  { org: "cloudflare", name: "Cloudflare", category: "Featured", description: "Connectivity cloud" },
-  { org: "shopify", name: "Shopify", category: "Featured", description: "Commerce platform" },
+  { org: "vercel", name: "Vercel", category: "Developer tools", description: "Frontend cloud" },
+  { org: "stripe", name: "Stripe", category: "Fintech", description: "Financial infrastructure" },
+  { org: "github", name: "GitHub", category: "Developer tools", description: "Developer platform" },
+  { org: "supabase", name: "Supabase", category: "Developer tools", description: "Open source backend" },
+  { org: "linear", name: "Linear", category: "Developer tools", description: "Product development" },
+  { org: "cloudflare", name: "Cloudflare", category: "Infrastructure", description: "Connectivity cloud" },
+  { org: "shopify", name: "Shopify", category: "Commerce", description: "Commerce platform" },
   { org: "openai", name: "OpenAI", category: "AI", description: "AI research and products" },
   { org: "anthropics", name: "Anthropic", category: "AI", description: "AI safety and research" },
   { org: "huggingface", name: "Hugging Face", category: "AI", description: "Open machine learning" },
@@ -104,7 +103,6 @@ export const companies: Company[] = [
 
 export const categories = [
   "All",
-  "Featured",
   "AI",
   "Developer tools",
   "Infrastructure",
