@@ -75,6 +75,51 @@ The latest above-the-fold copy diff contains only intentional removals and one s
 - Desktop and mobile browser consoles contain no warnings or errors.
 - Lint and production build pass.
 
+## Readable grid follow-up
+
+### Evidence
+
+- User grid-size reference: `/var/folders/pn/y6tmtkw91nd2n89bldb2qjl40000gn/T/TemporaryItems/NSIRD_screencaptureui_3yvTZ6/Screenshot 2026-07-23 at 17.07.41.png`
+- Desktop company before: `/Users/blakefolgado/.codex/tmp/open-office-grid-qa-2026-07-23/01-company-desktop-before.png`
+- Mobile comparison before: `/Users/blakefolgado/.codex/tmp/open-office-grid-qa-2026-07-23/02-compare-mobile-before.png`
+- Desktop company after: `/Users/blakefolgado/.codex/tmp/open-office-grid-qa-2026-07-23/06-company-desktop-final.png`
+- Mobile comparison after: `/Users/blakefolgado/.codex/tmp/open-office-grid-qa-2026-07-23/05-compare-mobile-final.png`
+- Focused source/final comparison: `/Users/blakefolgado/.codex/tmp/open-office-grid-qa-2026-07-23/07-source-vs-final-grid.png`
+- Desktop viewport: 1440 × 900 CSS pixels at density 1.
+- Mobile viewport: 390 × 844 CSS pixels at density 1.
+- Source pixels: 3098 × 1718. It was normalized to 1623 × 900 for the focused comparison.
+- Implementation pixels: 1440 × 900.
+- Comparison pixels: 3087 × 900, including a 24px divider.
+- State: 12-month public activity on the Vercel company page; two-company comparison on mobile.
+
+The reference and implementation show different companies and surrounding page structures, so the focused comparison judges grid scale, legibility, rhythm, and year visibility rather than exact cell data.
+
+### Comparison history
+
+- P1: Comparison cells measured 13px on mobile and company-page cells fell to 11px, making the primary visualization feel miniature.
+  - Fix: Increased the company grid to 18px on desktop and 16px on mobile; increased comparison grids to 17px on desktop and 16px on mobile.
+  - Recheck: The 1440px company view retains all 52 weeks at 18px. The 390px comparison view keeps 16px cells and exposes the year through horizontal touch scrolling.
+- P2: Month, weekday, and legend labels were 9px and looked weak beside the enlarged cells.
+  - Fix: Increased the labels and legend to 10px and the legend swatches to 10px.
+  - Recheck: Labels remain subordinate but readable in both final captures.
+- P1: The first mobile enlargement caused the heatmap container to expand to 1090px and be clipped by document overflow, so the unseen weeks were not reachable.
+  - Fix: Constrained the heatmap scroller and comparison grid items with explicit width and minimum-width rules while keeping momentum scrolling.
+  - Recheck: At 390px, document width remains 390px, the scroller is 332px wide with 1090px of content, and `scrollLeft` reaches 280px.
+
+### Fidelity ledger
+
+| Surface | Result |
+| --- | --- |
+| Typography | Month, weekday, and legend labels are now 10px; the existing Geist family, hierarchy, and copy remain unchanged. |
+| Spacing and layout | The grid is materially larger. The desktop year still fits in one view; mobile deliberately scrolls horizontally inside the activity panel. |
+| Colour and tokens | GitHub green intensity steps, near-black surface, borders, and muted labels are unchanged. |
+| Images and assets | Company avatars and existing Lucide icons are unchanged. No generated, placeholder, CSS, or inline-SVG assets were introduced. |
+| Copy and content | No visible copy changed. The above-the-fold copy diff is empty. |
+| Responsiveness | 18px desktop cells and 16px mobile cells remain contained, with no document-level horizontal overflow. |
+| Interaction | Period controls are unchanged. Mobile horizontal swipe was exercised and exposes later weeks without moving the page. |
+
+No actionable P0, P1, or P2 findings remain after the second comparison.
+
 No actionable P0, P1, or P2 findings remain.
 
 final result: passed

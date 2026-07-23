@@ -498,24 +498,28 @@ a {
 }
 
 .heatmap-scroll {
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-color: var(--border) transparent;
   scrollbar-width: thin;
+  width: 100%;
 }
 
 .heatmap {
   --cell-step: calc(var(--grid-size) + var(--grid-gap));
   display: grid;
   grid-template-columns: 30px calc(var(--week-count) * var(--cell-step));
-  grid-template-rows: 18px 7fr 22px;
+  grid-template-rows: 20px 7fr 24px;
   min-width: calc(30px + var(--week-count) * var(--cell-step));
   width: max-content;
 }
 
 .month-labels {
   display: grid;
-  font-size: 9px;
+  font-size: 10px;
   grid-column: 2;
   grid-template-columns: repeat(var(--week-count), var(--cell-step));
   grid-row: 1;
@@ -530,7 +534,7 @@ a {
 .weekday-labels {
   color: var(--muted);
   display: grid;
-  font-size: 9px;
+  font-size: 10px;
   grid-column: 1;
   grid-row: 2;
   grid-template-rows: repeat(7, var(--grid-size));
@@ -583,7 +587,7 @@ a {
   align-items: center;
   color: var(--muted);
   display: flex;
-  font-size: 9px;
+  font-size: 10px;
   gap: 4px;
   grid-column: 2;
   grid-row: 3;
@@ -594,8 +598,8 @@ a {
 .legend i {
   border: 1px solid rgba(240, 246, 252, 0.035);
   border-radius: 2px;
-  height: 9px;
-  width: 9px;
+  height: 10px;
+  width: 10px;
 }
 
 .coverage-line {
@@ -932,7 +936,7 @@ footer > span {
 }
 
 .activity-panel {
-  --grid-size: 15px;
+  --grid-size: 18px;
   --grid-gap: 4px;
   border-bottom: 1px solid var(--border);
   padding: 20px 6px 15px;
@@ -1569,13 +1573,15 @@ footer > span {
   display: grid;
   gap: 12px;
   margin-top: 14px;
+  min-width: 0;
 }
 
 .comparison-grids article {
-  --grid-size: 13px;
-  --grid-gap: 3px;
+  --grid-size: 17px;
+  --grid-gap: 4px;
   border: 1px solid var(--border);
   border-radius: 7px;
+  min-width: 0;
   padding: 18px;
 }
 
@@ -1831,8 +1837,13 @@ footer > span {
   }
 
   .activity-panel {
-    --grid-size: 11px;
-    --grid-gap: 3px;
+    --grid-size: 16px;
+    --grid-gap: 4px;
+  }
+
+  .comparison-grids article {
+    --grid-size: 16px;
+    --grid-gap: 4px;
   }
 
   .contributor-row {
