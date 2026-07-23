@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ContributionGrid } from "@/components/contribution-grid";
 import { VelocityChart } from "@/components/velocity-chart";
-import { companies } from "@/lib/companies";
+import type { Company } from "@/lib/companies";
 import { calculateOrganizationStats, formatMomentum } from "@/lib/analytics";
 import type { OrganizationActivity } from "@/lib/types";
 
@@ -21,7 +21,13 @@ const comparisonMetrics = [
   },
 ];
 
-export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
+export function CompareTool({
+  availableCompanies,
+  initialOrgs,
+}: {
+  availableCompanies: Company[];
+  initialOrgs: string[];
+}) {
   const [orgs, setOrgs] = useState(initialOrgs.slice(0, 3));
   const [data, setData] = useState<Record<string, OrganizationActivity>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -30,7 +36,10 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
   const [query, setQuery] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const available = useMemo(() => companies.filter((company) => !orgs.includes(company.org)), [orgs]);
+  const available = useMemo(
+    () => availableCompanies.filter((company) => !orgs.includes(company.org)),
+    [availableCompanies, orgs],
+  );
   const matches = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return available
@@ -110,7 +119,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
 
       <div className="compare-picker" aria-label="Companies being compared">
         {orgs.map((org) => {
-          const company = companies.find((item) => item.org === org);
+          const company = availableCompanies.find((item) => item.org === org);
           const name = company?.name || org;
           return (
             <button
@@ -200,7 +209,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
       </div>
 
       {failedOrgs.map((org) => {
-        const name = companies.find((company) => company.org === org)?.name || org;
+        const name = availableCompanies.find((company) => company.org === org)?.name || org;
         return (
           <div className="compare-error" key={org} role="alert">
             <CircleAlert aria-hidden="true" size={16} />

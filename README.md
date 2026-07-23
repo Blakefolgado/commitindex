@@ -3,6 +3,8 @@
 Explore public GitHub activity across popular startups and large technology
 companies.
 
+Live at [open-office.vercel.app](https://open-office.vercel.app).
+
 ## What the grid measures
 
 Each company calendar sums GitHub's official daily commit statistics across the
@@ -25,9 +27,16 @@ employee productivity.
 - `/company/[org]` adds shipping patterns, repository pulse and contributor
   rankings aggregated across the same repository sample.
 - `/leaderboards` ranks the curated directory by commits, consistency,
-  momentum, active days and weekend activity.
+  momentum, active days and weekend activity for companies and 2,371 public
+  contributors.
 - `/compare` compares up to three organisations using live cached data.
+- `/compare/people` compares individual public contributor activity, additions
+  and deletions.
 - Company pages render a custom 1200×630 Open Graph image from the same data.
+
+V1 ships 85 fully indexed companies. A larger verified catalogue is checked in
+and only becomes visible as its guarded snapshots are generated, preventing
+empty rows or incomplete comparisons.
 
 The leaderboard uses a checked-in snapshot so visitors do not trigger hundreds
 of GitHub API requests. Refresh it before a release with:
@@ -35,6 +44,24 @@ of GitHub API requests. Refresh it before a release with:
 ```bash
 pnpm leaderboard:generate
 ```
+
+When adding companies, reuse the current verified rows and fetch only new
+organisations:
+
+```bash
+OPEN_OFFICE_INCREMENTAL=1 pnpm leaderboard:generate
+OPEN_OFFICE_INCREMENTAL=1 pnpm people:generate
+```
+
+Large additions can be refreshed in guarded batches:
+
+```bash
+OPEN_OFFICE_INCREMENTAL=1 OPEN_OFFICE_BATCH_SIZE=10 OPEN_OFFICE_WORKERS=1 pnpm leaderboard:generate
+OPEN_OFFICE_INCREMENTAL=1 OPEN_OFFICE_BATCH_SIZE=10 OPEN_OFFICE_WORKERS=1 pnpm people:generate
+```
+
+Both generators refuse to overwrite their snapshots if any requested company
+fails, so rate limits cannot silently publish a partial directory.
 
 The UI displays the snapshot's real generation date. A zero GitHub statistics
 response is shown as unavailable data, not as proof that a company shipped

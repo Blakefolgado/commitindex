@@ -4,6 +4,12 @@ const source = await readFile(new URL("../lib/companies.ts", import.meta.url), "
 const companies = [...source.matchAll(/\{ org: "([^"]+)", name: "([^"]+)", category: "([^"]+)", description: "([^"]+)" \}/g)]
   .map((match) => ({ org: match[1], name: match[2], category: match[3], description: match[4] }));
 const baseUrl = process.env.OPEN_OFFICE_API_BASE || "https://open-office.vercel.app";
+const incremental = process.env.OPEN_OFFICE_INCREMENTAL === "1";
+const snapshotUrl = new URL("../data/leaderboard.json", import.meta.url);
+const failures = [];
+const requestedBatchSize = Number.parseInt(process.env.OPEN_OFFICE_BATCH_SIZE || "", 10);
+const requestedWorkers = Number.parseInt(process.env.OPEN_OFFICE_WORKERS || "2", 10);
+const workerCount = Math.max(1, Math.min(Number.isFinite(requestedWorkers) ? requestedWorkers : 2, 4));
 
 function calculateStats(activity) {
   const active = activity.filter((day) => day.count > 0);
@@ -58,6 +64,7 @@ async function load(company) {
     } catch (error) {
       if (attempt === 2) {
         console.error(`Skipped ${company.org}: ${error.message}`);
+        failures.push(company.org);
         return null;
       }
       await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
@@ -65,11 +72,27 @@ async function load(company) {
   }
 }
 
+const previousEntries = incremental
+  ? JSON.parse(await readFile(snapshotUrl, "utf8")).entries
+  : [];
+const previousByOrg = new Map(previousEntries.map((entry) => [entry.org.toLowerCase(), entry]));
 const entries = [];
+const missing = companies.filter((company) => {
+  const previous = previousByOrg.get(company.org.toLowerCase());
+  if (!previous) return true;
+  entries.push({ ...previous, ...company });
+  return false;
+});
+const pending = Number.isFinite(requestedBatchSize) && requestedBatchSize > 0
+  ? missing.slice(0, requestedBatchSize)
+  : missing;
+if (incremental) {
+  console.log(`Reusing ${entries.length} existing entries; fetching ${pending.length} of ${missing.length} missing companies.`);
+}
 let cursor = 0;
 async function worker() {
-  while (cursor < companies.length) {
-    const company = companies[cursor];
+  while (cursor < pending.length) {
+    const company = pending[cursor];
     cursor += 1;
     const entry = await load(company);
     if (entry) entries.push(entry);
@@ -77,9 +100,12 @@ async function worker() {
   }
 }
 
-await Promise.all([worker(), worker()]);
+await Promise.all(Array.from({ length: Math.min(workerCount, pending.length) }, () => worker()));
+if (failures.length) {
+  throw new Error(`Refusing to write a partial snapshot; ${failures.length} companies failed: ${failures.join(", ")}`);
+}
 entries.sort((a, b) => b.totalCommits - a.totalCommits);
-await writeFile(new URL("../data/leaderboard.json", import.meta.url), `${JSON.stringify({
+await writeFile(snapshotUrl, `${JSON.stringify({
   generatedAt: new Date().toISOString(),
   source: "GitHub repository statistics across each organisation's eight most recently active public repositories",
   entries,
