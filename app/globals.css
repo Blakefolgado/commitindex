@@ -937,6 +937,8 @@ footer > span {
 
 .company-hero-actions {
   align-self: start;
+  display: flex;
+  gap: 8px;
   padding-top: 5px;
 }
 

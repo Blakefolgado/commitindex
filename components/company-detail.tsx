@@ -74,6 +74,10 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
           </div>
         </div>
         <div className="company-hero-actions">
+          <Link className="outline-button" href={`/compare?orgs=${data.org}`}>
+            <GitCompareArrows aria-hidden="true" size={15} />
+            Compare
+          </Link>
           <ShareButton title={`${data.name} public GitHub activity`} />
         </div>
       </section>
@@ -164,10 +168,6 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
       <section className="data-panel repository-pulse">
         <div className="section-heading-row compact">
           <h2>Repository pulse</h2>
-          <Link className="outline-button" href={`/compare?orgs=${data.org},vercel`}>
-            <GitCompareArrows aria-hidden="true" size={15} />
-            Compare {data.name}
-          </Link>
         </div>
         <div className="repository-table-wrap">
           <table>
