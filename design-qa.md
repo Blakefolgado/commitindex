@@ -122,4 +122,37 @@ No actionable P0, P1, or P2 findings remain after the second comparison.
 
 No actionable P0, P1, or P2 findings remain.
 
+## Velocity chart follow-up
+
+### Evidence
+
+- Accepted visual system: `/Users/blakefolgado/.codex/generated_images/019f8fbb-2c89-76b2-8746-cd739cae721a/call_mwmad7lF8eQL9xtSAKd362Hq.png`
+- Desktop company chart: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/01-company-chart.png`
+- Desktop comparison chart: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/02-compare-chart.png`
+- Mobile comparison chart: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/03-compare-mobile-chart.png`
+- Mobile company viewport: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/06-company-mobile-viewport.png`
+- Mobile comparison after horizontal scroll: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/07-compare-mobile-scrolled.png`
+- Browser method: Codex in-app browser.
+- Desktop viewport: 1440 × 900 CSS pixels at density 1.
+- Mobile viewport: 390 × 844 CSS pixels at density 1.
+- State: Vercel company activity and Vercel/Stripe comparison with live GitHub data.
+
+The accepted concept does not include the newly requested velocity visualization. It is used here as the visual-system reference for typography, palette, density, border treatment, and container behavior rather than as an exact content mock.
+
+### Fidelity ledger
+
+| Surface | Result |
+| --- | --- |
+| Typography | Existing Geist hierarchy is preserved. `Velocity` uses the established 18px section heading; chart dates and legend values use the existing 9–11px data-label scale. |
+| Spacing and layout | The company chart is an open full-width band between activity and detail data. Compare uses one existing bordered-panel treatment beneath the scorecard. |
+| Colour and tokens | Vercel uses GitHub green, additional comparison series use existing blue and a restrained GitHub-compatible purple. Background, guides, borders, and text use existing tokens. |
+| Images and assets | No new image assets or decorative graphics were added. The charts are semantic data UI rendered from live activity values. |
+| Copy and content | User-authorized additions are limited to `Velocity`, `/week`, and `momentum`. No subtitle or explainer copy was added. |
+| Responsiveness | The single-company 12-week chart fits 354px. The multi-company plot is 620px inside a 332px scroller; document width stays 390px and horizontal scroll reaches 288px. |
+| Interaction | Hover titles expose exact company, commits, and week on desktop. Mobile horizontal swipe exposes later weeks without moving the page. |
+
+The chart uses trailing seven-day totals, a four-week average for `/week`, and the existing 30-day momentum calculation. Twelve weekly groups are visible on desktop; mobile comparison deliberately scrolls to preserve bar legibility.
+
+The above-the-fold directory copy diff is empty. On Compare, the only new visible copy is the requested chart title and its compact legend. No actionable P0, P1, or P2 findings remain.
+
 final result: passed

@@ -4,6 +4,7 @@ import { ArrowRight, CircleAlert, LoaderCircle, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ContributionGrid } from "@/components/contribution-grid";
+import { VelocityChart } from "@/components/velocity-chart";
 import { companies } from "@/lib/companies";
 import { calculateOrganizationStats, formatMomentum } from "@/lib/analytics";
 import type { OrganizationActivity } from "@/lib/types";
@@ -263,6 +264,22 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
               ))}
             </div>
           ))}
+        </section>
+      )}
+
+      {loadedItems.length > 0 && (
+        <section className="comparison-velocity" aria-labelledby="comparison-velocity-heading">
+          <div className="section-heading-row compact">
+            <h2 id="comparison-velocity-heading">Velocity</h2>
+          </div>
+          <VelocityChart
+            ariaLabel={`Weekly commit velocity for ${loadedItems.map((item) => item.name).join(", ")}`}
+            series={loadedItems.map((item) => ({
+              activity: item.activity,
+              momentum: item.stats.momentum,
+              name: item.name,
+            }))}
+          />
         </section>
       )}
 
