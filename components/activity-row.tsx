@@ -15,6 +15,50 @@ function activityLevel(value: number, max: number) {
   return Math.max(1, Math.min(4, Math.ceil((value / max) * 4)));
 }
 
+function ActivityTrend({
+  company,
+  totalCommits,
+  values,
+}: {
+  company: string;
+  totalCommits?: number;
+  values: number[];
+}) {
+  if (totalCommits === undefined) {
+    return (
+      <span className="directory-trend unavailable" aria-label={`Activity snapshot unavailable for ${company}`}>
+        <span aria-hidden="true">—</span>
+      </span>
+    );
+  }
+
+  const minimum = Math.min(...values);
+  const maximum = Math.max(...values);
+  const range = Math.max(maximum - minimum, 1);
+  const points = values
+    .map((value, index) => {
+      const x = 2 + (index / Math.max(values.length - 1, 1)) * 60;
+      const y = 19 - ((value - minimum) / range) * 16;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  const recent = values.slice(-4).reduce((sum, value) => sum + value, 0);
+  const previous = values.slice(-8, -4).reduce((sum, value) => sum + value, 0);
+  const direction = recent > previous ? "positive" : recent < previous ? "negative" : "neutral";
+  const directionLabel = direction === "positive" ? "growing" : direction === "negative" ? "slowing" : "flat";
+  const label = `${company} shipped ${totalCommits.toLocaleString()} sampled public commits; 12-week activity is ${directionLabel}`;
+
+  return (
+    <span className={`directory-trend ${direction}`} role="img" aria-label={label}>
+      <svg viewBox="0 0 64 21" aria-hidden="true">
+        <polygon points={`2,20 ${points} 62,20`} />
+        <polyline points={points} />
+      </svg>
+      <span aria-hidden="true">{totalCommits.toLocaleString()}</span>
+    </span>
+  );
+}
+
 export function ActivityRow({
   company,
   entry,
@@ -53,9 +97,7 @@ export function ActivityRow({
           <i className={`level-${activityLevel(total, max)}`} aria-hidden="true" key={index} />
         ))}
       </span>
-      <span className="directory-commits">
-        {entry?.totalCommits ? entry.totalCommits.toLocaleString() : "—"}
-      </span>
+      <ActivityTrend company={company.name} totalCommits={entry?.totalCommits} values={totals} />
       <ArrowRight className="directory-arrow" aria-hidden="true" size={15} />
     </Link>
   );

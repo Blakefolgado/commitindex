@@ -183,7 +183,7 @@ export function Directory({
           <span>#</span>
           <span>Company</span>
           <span>12-week activity</span>
-          <span>Commits</span>
+          <span>Trend</span>
           <span />
         </div>
 

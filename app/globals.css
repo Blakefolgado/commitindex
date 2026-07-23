@@ -274,7 +274,7 @@ a {
   align-items: center;
   display: grid;
   gap: 18px;
-  grid-template-columns: 30px minmax(220px, 1fr) minmax(180px, 240px) 120px 18px;
+  grid-template-columns: 30px minmax(220px, 1fr) minmax(180px, 240px) 104px 18px;
 }
 
 .directory-list-header {
@@ -376,11 +376,50 @@ a {
   background: #39d353;
 }
 
-.directory-commits {
+.directory-trend {
+  align-items: center;
   color: var(--muted);
-  font-size: 12px;
+  display: flex;
+  font-size: 10px;
   font-variant-numeric: tabular-nums;
-  text-align: right;
+  gap: 7px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.directory-trend svg {
+  display: block;
+  flex: 0 0 64px;
+  height: 21px;
+  overflow: visible;
+  width: 64px;
+}
+
+.directory-trend polygon {
+  fill: currentColor;
+  opacity: 0.08;
+}
+
+.directory-trend polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.directory-trend.positive {
+  color: #3fb950;
+}
+
+.directory-trend.negative {
+  color: #f85149;
+}
+
+.directory-trend.neutral,
+.directory-trend.unavailable {
+  color: var(--muted);
 }
 
 .directory-arrow {
@@ -2131,7 +2170,7 @@ footer > span {
 
   .directory-list-header,
   .directory-row {
-    grid-template-columns: 30px minmax(180px, 1fr) minmax(150px, 200px) 100px 18px;
+    grid-template-columns: 30px minmax(180px, 1fr) minmax(150px, 200px) 104px 18px;
   }
 
   .company-row {
@@ -2252,14 +2291,21 @@ footer > span {
   .directory-list-header,
   .directory-row {
     gap: 10px;
-    grid-template-columns: 24px minmax(0, 1fr) 18px;
+    grid-template-columns: 24px minmax(0, 1fr) 84px 18px;
   }
 
   .directory-list-header span:nth-child(3),
-  .directory-list-header span:nth-child(4),
-  .directory-activity,
-  .directory-commits {
+  .directory-activity {
     display: none;
+  }
+
+  .directory-trend {
+    gap: 4px;
+  }
+
+  .directory-trend svg {
+    flex-basis: 54px;
+    width: 54px;
   }
 
   .company-list {

@@ -355,4 +355,42 @@ The above-the-fold copy remains unchanged. The local server returned the leaderb
 
 The accepted table system and latest browser screenshots were inspected directly. The implementation preserves the original dark open-table design, adds no above-the-fold explainer copy, and has no remaining actionable P0, P1 or P2 mismatch.
 
+## Homepage trend follow-up
+
+### Evidence
+
+- Accepted visual system: `/Users/blakefolgado/.codex/generated_images/019f8fbb-2c89-76b2-8746-cd739cae721a/call_mwmad7lF8eQL9xtSAKd362Hq.png`
+- Desktop homepage: `/Users/blakefolgado/.codex/tmp/open-office-homepage-trends-desktop.png`
+- Mobile homepage: `/Users/blakefolgado/.codex/tmp/open-office-homepage-trends-mobile.png`
+- Browser method: Codex in-app browser.
+- Desktop viewport: 1280 CSS pixels wide.
+- Mobile viewport: 390 × 844 CSS pixels.
+- Data state: 85 companies with live 12-week public GitHub activity.
+
+### Comparison history
+
+- P1: The commit column exposed only a cumulative number, making growth and slowdown impossible to scan.
+  - Fix: Replaced the raw column with a compact 12-week line and area sparkline. The latest four weeks are compared with the previous four and encoded in semantic green, red or muted grey.
+  - Recheck: All 85 company rows render a sparkline and retain the exact sampled commit total beside it and in the accessible label.
+- P2: Mobile removed every activity signal from the directory.
+  - Fix: The larger 12-cell activity strip still collapses at 390px, while the compact trend chart remains.
+  - Recheck: The mobile row grid measures `24px 198px 84px 18px`; body overflow remains false.
+- P2: A wide raw-number column would work against the requested compact density.
+  - Fix: Reduced the desktop data column from 120px to 104px while retaining a 64px chart and exact total.
+  - Recheck: The desktop row resolves to `30px 510px 240px 104px 18px` with no horizontal overflow.
+
+### Fidelity ledger
+
+| Surface | Result |
+| --- | --- |
+| Typography | Existing compact table labels and tabular numerals remain. |
+| Spacing and layout | Rank and company remain plain; both eligible time-series columns are visual. No panel or extra explanatory row was added. |
+| Colour and tokens | Contribution cells keep GitHub greens. Sparklines use existing positive, negative and muted semantic colours. |
+| Images and assets | Company avatars remain the only images; the charts are code-native SVG. |
+| Copy and content | `Commits` became `Trend`. No subtitle, badge or explainer was added. |
+| Responsiveness | Desktop and 390px mobile have no body overflow. Mobile keeps one useful trend signal in every row. |
+| Accessibility | Every trend exposes company, exact sampled commits and growing/slowing/flat direction as one accessible graphic label. |
+
+Direct inspection of the accepted concept and latest desktop/mobile browser screenshots found no remaining actionable P0, P1 or P2 mismatch. The sole above-the-fold copy change is the requested `Commits` to `Trend` header.
+
 final result: passed
