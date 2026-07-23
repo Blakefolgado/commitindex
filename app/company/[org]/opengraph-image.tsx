@@ -73,6 +73,11 @@ export default async function Image({ params }: { params: Promise<{ org: string 
         </div>
       </div>
     ),
-    size,
+    {
+      ...size,
+      headers: {
+        "Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800",
+      },
+    },
   );
 }
