@@ -59,7 +59,6 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
         <img className="company-avatar-large" src={data.avatarUrl} alt="" width={132} height={132} />
         <div className="company-heading">
           <h1>{data.name}</h1>
-          <p>@{data.org}</p>
           <div className="company-links">
             {data.websiteUrl && (
               <a href={data.websiteUrl} target="_blank" rel="noreferrer">
@@ -75,7 +74,6 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
         </div>
         <div className="company-hero-actions">
           <ShareButton title={`${data.name} public GitHub activity`} />
-          <span>{data.sampledRepos.length} active public repos sampled · updated daily</span>
         </div>
       </section>
 
@@ -90,10 +88,7 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
 
       <section className="activity-panel">
         <div className="section-heading-row">
-          <div>
-            <h2>Public shipping activity</h2>
-            <p>Non-merge commits across the sampled public repositories.</p>
-          </div>
+          <h2>Public shipping activity</h2>
           <div className="inline-period-controls">
             {([
               ["rolling", "Last 12 months"],
@@ -113,7 +108,6 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
         <section className="data-panel top-shippers">
           <div className="section-heading-row compact">
             <h2>Top shippers</h2>
-            <span>Across {contributors?.sampledRepositories ?? data.sampledRepos.length} sampled repos</span>
           </div>
           {topContributors.length ? (
             <div className="contributors-table">
@@ -134,7 +128,6 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
           ) : (
             <p className="panel-status"><LoaderCircle className="spin" aria-hidden="true" size={16} /> Ranking contributors from sampled repositories…</p>
           )}
-          <p className="data-note">Contributor totals come from GitHub&apos;s repository statistics and can differ from the calendar total.</p>
         </section>
 
         <section className="data-panel shipping-dna">

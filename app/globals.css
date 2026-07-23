@@ -173,17 +173,6 @@ a {
   place-items: center;
 }
 
-.about-link {
-  color: var(--muted);
-  font-size: 14px;
-  justify-self: end;
-  text-decoration: none;
-}
-
-.about-link:hover {
-  color: var(--text);
-}
-
 .directory-shell {
   margin: 0 auto;
   max-width: 1050px;
@@ -206,12 +195,6 @@ a {
   letter-spacing: -0.045em;
   line-height: 1;
   margin: 0;
-}
-
-.page-title p {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 12px 0 0;
 }
 
 .directory-search-row {
@@ -780,6 +763,7 @@ a {
 }
 
 footer {
+  align-items: flex-start;
   border-top: 1px solid var(--border);
   color: var(--muted);
   display: flex;
@@ -790,21 +774,19 @@ footer {
   padding: 30px max(28px, calc((100vw - 1484px) / 2)) 48px;
 }
 
-footer > div {
-  align-items: flex-start;
-  display: flex;
-  gap: 10px;
+footer details {
   max-width: 780px;
+}
+
+footer summary {
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 500;
 }
 
 footer p {
   line-height: 1.55;
-  margin: 0;
-}
-
-footer strong {
-  color: var(--text);
-  font-weight: 500;
+  margin: 10px 0 0;
 }
 
 footer > span {
@@ -893,16 +875,11 @@ footer > span {
   margin: 0;
 }
 
-.company-heading > p {
-  color: var(--muted);
-  font-size: 19px;
-  margin: 7px 0 9px;
-}
-
 .company-links {
   display: flex;
   flex-wrap: wrap;
   gap: 18px;
+  margin-top: 13px;
 }
 
 .company-links a {
@@ -915,17 +892,8 @@ footer > span {
 }
 
 .company-hero-actions {
-  align-items: flex-end;
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 5px 0;
-}
-
-.company-hero-actions > span {
-  color: var(--muted);
-  font-size: 11px;
+  align-self: start;
+  padding-top: 5px;
 }
 
 .headline-stats {
@@ -990,17 +958,6 @@ footer > span {
   font-size: 18px;
   letter-spacing: -0.02em;
   margin: 0;
-}
-
-.section-heading-row p {
-  color: var(--muted);
-  font-size: 11px;
-  margin: 5px 0 0;
-}
-
-.section-heading-row > span {
-  color: var(--muted);
-  font-size: 11px;
 }
 
 .inline-period-controls {
@@ -1102,13 +1059,6 @@ footer > span {
   text-align: center;
 }
 
-.data-note {
-  color: #6e7681;
-  font-size: 10px;
-  line-height: 1.45;
-  margin: 10px 0 0;
-}
-
 .shipping-dna dl {
   margin: 10px 0 0;
 }
@@ -1171,7 +1121,7 @@ footer > span {
 }
 
 .page-title {
-  padding: 15px 0 24px;
+  padding: 15px 0 20px;
 }
 
 .leaderboard-filters {
@@ -1239,10 +1189,6 @@ footer > span {
 
 .leaderboard-panel {
   padding: 0;
-}
-
-.leaderboard-panel > h2 {
-  padding: 14px 18px;
 }
 
 .leaderboard-table {
@@ -1654,7 +1600,6 @@ footer > span {
   text-decoration: none;
 }
 
-.comparison-grids p,
 .compare-loading-note {
   color: var(--muted);
   font-size: 10px;
@@ -1677,10 +1622,6 @@ footer > span {
   .site-nav {
     gap: 22px;
     justify-self: end;
-  }
-
-  .about-link {
-    display: none;
   }
 
   .directory-shell {
@@ -1744,8 +1685,6 @@ footer > span {
   }
 
   .company-hero-actions {
-    align-items: center;
-    flex-direction: row;
     grid-column: 1 / -1;
   }
 
@@ -1868,11 +1807,6 @@ footer > span {
 
   .company-links {
     gap: 7px;
-  }
-
-  .company-hero-actions > span {
-    max-width: 190px;
-    text-align: right;
   }
 
   .headline-stats {

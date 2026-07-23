@@ -27,7 +27,6 @@ export function SiteHeader() {
           );
         })}
       </nav>
-      <Link className="about-link" href="/#about">About the data</Link>
     </header>
   );
 }

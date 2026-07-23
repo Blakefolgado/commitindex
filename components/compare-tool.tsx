@@ -101,7 +101,6 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
     <main className="compare-shell">
       <div className="page-title">
         <h1>Compare companies</h1>
-        <p>Choose up to three companies.</p>
       </div>
 
       <div className="compare-picker" aria-label="Companies being compared">
@@ -142,7 +141,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
               aria-label="Add a company to compare"
               autoCapitalize="none"
               autoComplete="off"
-              placeholder="Search to add company"
+              placeholder="Add company"
               role="combobox"
               spellCheck={false}
               value={query}
@@ -274,13 +273,12 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
             <article key={org}>
               <div><h2>{item.name}</h2><Link href={`/company/${org}`}>Deep dive <ArrowRight size={13} /></Link></div>
               <ContributionGrid activity={item.activity} org={item.org} period="rolling" />
-              <p>{item.coverage}</p>
             </article>
           ) : null;
         })}
       </section>
 
-      {!orgs.length && <div className="empty-state"><h2>Add a company to begin</h2><p>Choose from the curated directory above.</p></div>}
+      {!orgs.length && <div className="empty-state"><h2>Add a company</h2></div>}
       {loading.length > 0 && <span className="compare-loading-note" role="status">Loading {loading.length} live {loading.length === 1 ? "profile" : "profiles"} from GitHub…</span>}
     </main>
   );

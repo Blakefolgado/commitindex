@@ -1,6 +1,6 @@
 "use client";
 
-import { Info, LoaderCircle, Search, X } from "lucide-react";
+import { LoaderCircle, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -209,15 +209,14 @@ export function Directory({
       </section>
 
       <footer id="about">
-        <div>
-          <Info aria-hidden="true" size={17} />
+        <details>
+          <summary>Methodology</summary>
           <p>
-            <strong>Public repositories only.</strong> Activity uses non-merge commits from
-            each organisation&apos;s eight most recently active public repositories. It does
-            not include private work and is not a measure of company size or productivity.
+            Public non-merge commits from eight recently active repositories. Private work
+            is excluded; totals are not productivity scores.
           </p>
-        </div>
-        <span>GitHub public data · 52-week window</span>
+        </details>
+        <span>GitHub · Updated daily</span>
       </footer>
 
       <dialog className="request-dialog" ref={dialogRef} onCancel={closeRequest}>

@@ -68,10 +68,6 @@ export function LeaderboardClient({ snapshot }: { snapshot: LeaderboardSnapshot 
   const weekend = snapshot.entries.toSorted((a, b) => b.stats.weekendRatio - a.stats.weekendRatio)[0];
   const daySeed = Number(new Date().toISOString().slice(0, 10).replaceAll("-", ""));
   const rabbitHole = snapshot.entries[daySeed % Math.max(snapshot.entries.length, 1)];
-  const snapshotDate = snapshot.generatedAt
-    ? new Date(snapshot.generatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
-    : "pending";
-
   function toggle(org: string) {
     setSelected((current) => current.includes(org)
       ? current.filter((item) => item !== org)
@@ -81,8 +77,7 @@ export function LeaderboardClient({ snapshot }: { snapshot: LeaderboardSnapshot 
   return (
     <main className="leaderboard-shell">
       <div className="page-title">
-        <h1>Who&apos;s shipping in public?</h1>
-        <p>{snapshot.entries.length} companies tracked from public GitHub activity. Snapshot {snapshotDate}.</p>
+        <h1>Leaderboards</h1>
       </div>
 
       <div className="leaderboard-filters">
@@ -104,7 +99,6 @@ export function LeaderboardClient({ snapshot }: { snapshot: LeaderboardSnapshot 
       </div>
 
       <section className="leaderboard-panel">
-        <h2>Company leaderboard</h2>
         <div className="leaderboard-table-wrap">
           <table className="leaderboard-table">
             <thead>
