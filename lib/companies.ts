@@ -74,7 +74,7 @@ export const companies: Company[] = [
   { org: "open-telemetry", name: "OpenTelemetry", category: "Infrastructure", description: "Observability framework" },
   { org: "coinbase", name: "Coinbase", category: "Fintech", description: "Crypto platform" },
   { org: "block", name: "Block", category: "Fintech", description: "Financial services" },
-  { org: "wise", name: "Wise", category: "Fintech", description: "International money" },
+  { org: "transferwise", name: "Wise", category: "Fintech", description: "International money" },
   { org: "adyen", name: "Adyen", category: "Fintech", description: "Payments platform" },
   { org: "plaid", name: "Plaid", category: "Fintech", description: "Financial data network" },
   { org: "klarna", name: "Klarna", category: "Fintech", description: "Payments and shopping" },
