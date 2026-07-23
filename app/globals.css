@@ -1351,6 +1351,31 @@ footer > span {
   margin-bottom: 14px;
 }
 
+.leaderboard-kind-tabs {
+  display: flex;
+  margin-bottom: 14px;
+}
+
+.leaderboard-kind-tabs button {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  min-height: 34px;
+  padding: 0 18px;
+}
+
+.leaderboard-kind-tabs button:hover,
+.leaderboard-kind-tabs button.active {
+  color: var(--text);
+}
+
+.leaderboard-kind-tabs button.active {
+  border-bottom-color: #3fb950;
+}
+
 .leaderboard-filters label {
   align-items: center;
   border: 1px solid var(--border);
@@ -1530,6 +1555,120 @@ footer > span {
 }
 
 .momentum-sparkline polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.people-loading {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  justify-content: center;
+  min-height: 260px;
+}
+
+.people-loading button {
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.people-ranking-tabs button {
+  min-width: 112px;
+}
+
+.people-table {
+  min-width: 1040px;
+}
+
+.people-table th:nth-child(n + 5):nth-child(-n + 8),
+.people-table td:nth-child(n + 5):nth-child(-n + 8) {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.people-col-rank {
+  width: 52px;
+}
+
+.people-col-person {
+  width: 190px;
+}
+
+.people-col-company {
+  width: 156px;
+}
+
+.people-col-trend {
+  width: 112px;
+}
+
+.people-col-commits {
+  width: 90px;
+}
+
+.people-col-added,
+.people-col-deleted {
+  width: 105px;
+}
+
+.people-col-repos {
+  width: 72px;
+}
+
+.people-col-compare {
+  width: 50px;
+}
+
+.leader-person,
+.person-company {
+  align-items: center;
+  color: var(--text) !important;
+  display: flex;
+  gap: 9px;
+  min-width: 0;
+}
+
+.leader-person img,
+.person-company img {
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  flex: 0 0 auto;
+  object-fit: cover;
+}
+
+.person-company img {
+  border-radius: 5px;
+}
+
+.leader-person strong,
+.person-company span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.person-sparkline {
+  color: var(--muted);
+  display: block;
+  height: 30px;
+  margin-left: auto;
+  width: 96px;
+}
+
+.person-sparkline polygon {
+  fill: currentColor;
+  opacity: 0.1;
+}
+
+.person-sparkline polyline {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -1746,6 +1885,90 @@ footer > span {
 
 .compare-shell .page-title h1 {
   font-size: 32px;
+}
+
+.people-compare-title {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.people-compare-title a {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  gap: 5px;
+  text-decoration: none;
+}
+
+.people-compare-title a:hover {
+  color: var(--text);
+}
+
+.people-scoreboard .scoreboard-labels,
+.people-scoreboard .scoreboard-row {
+  grid-template-columns: minmax(190px, 1.5fr) minmax(130px, 1fr) repeat(4, minmax(90px, 0.75fr));
+}
+
+.people-scoreboard .scoreboard-row {
+  text-decoration: none;
+}
+
+.people-scoreboard .scoreboard-row > strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.people-comparison-chart {
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  margin-top: 14px;
+  padding: 18px;
+}
+
+.people-line-chart {
+  display: block;
+  height: 220px;
+  overflow: visible;
+  width: 100%;
+}
+
+.people-chart-guide {
+  stroke: var(--border-subtle);
+  stroke-width: 1;
+}
+
+.people-chart-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.people-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-top: 8px;
+}
+
+.people-chart-legend span {
+  align-items: center;
+  display: flex;
+  font-size: 11px;
+  gap: 7px;
+}
+
+.people-chart-legend i {
+  border-radius: 50%;
+  height: 8px;
+  width: 8px;
+}
+
+.people-chart-legend small {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .comparison-mobile-matrix {

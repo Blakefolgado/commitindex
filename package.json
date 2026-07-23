@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "leaderboard:generate": "node scripts/generate-leaderboard.mjs"
+    "leaderboard:generate": "node scripts/generate-leaderboard.mjs",
+    "people:generate": "node scripts/generate-people.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

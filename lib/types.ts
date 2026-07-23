@@ -62,6 +62,14 @@ export type ContributorSummary = {
   repositories: number;
   additions: number;
   deletions: number;
+  weeks: ContributorWeek[];
+};
+
+export type ContributorWeek = {
+  week: number;
+  commits: number;
+  additions: number;
+  deletions: number;
 };
 
 export type ContributorsPayload = {
@@ -89,4 +97,18 @@ export type LeaderboardSnapshot = {
   generatedAt: string;
   source: string;
   entries: LeaderboardEntry[];
+};
+
+export type PeopleLeaderboardEntry = ContributorSummary & {
+  id: string;
+  org: string;
+  company: string;
+  category: string;
+  companyAvatarUrl: string;
+};
+
+export type PeopleLeaderboardSnapshot = {
+  generatedAt: string;
+  source: string;
+  entries: PeopleLeaderboardEntry[];
 };

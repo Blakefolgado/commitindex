@@ -5,6 +5,7 @@ import type {
   ActivityDay,
   CodeFrequencyWeek,
   ContributorSummary,
+  ContributorWeek,
   ContributorsPayload,
   OrganizationActivity,
   RepoSummary,
@@ -48,9 +49,11 @@ type GitHubContributor = {
     login: string;
     avatar_url: string;
     html_url: string;
+    type: "Bot" | "User";
   } | null;
   total: number;
   weeks: {
+    w: number;
     a: number;
     d: number;
     c: number;
@@ -264,11 +267,16 @@ export async function getOrganizationContributors(rawOrg: string): Promise<Contr
   }
 
   const people = new Map<string, ContributorSummary>();
+  const personWeeks = new Map<string, Map<number, ContributorWeek>>();
   for (const { contributors } of responses) {
     for (const contributor of contributors) {
       if (!contributor.author) continue;
       const login = contributor.author.login;
-      if (/\[bot\]$|-bot$/i.test(login)) continue;
+      if (
+        contributor.author.type === "Bot"
+        || /(\[bot\]|-bot$|bot$|-robot$|robot$|machine$|-service$)/i.test(login)
+        || /^(actions-user|github-actions|bors|modular-magician|mozilla-pontoon|dependabot|renovate)$/i.test(login)
+      ) continue;
       const existing = people.get(login) ?? {
         login,
         avatarUrl: contributor.author.avatar_url,
@@ -277,21 +285,41 @@ export async function getOrganizationContributors(rawOrg: string): Promise<Contr
         repositories: 0,
         additions: 0,
         deletions: 0,
+        weeks: [],
       };
+      const weekly = personWeeks.get(login) ?? new Map<number, ContributorWeek>();
       existing.commits += contributor.total;
       existing.repositories += 1;
       for (const week of contributor.weeks) {
         existing.additions += week.a;
-        existing.deletions += week.d;
+        existing.deletions += Math.abs(week.d);
+        const current = weekly.get(week.w) ?? {
+          week: week.w,
+          commits: 0,
+          additions: 0,
+          deletions: 0,
+        };
+        current.commits += week.c;
+        current.additions += week.a;
+        current.deletions += Math.abs(week.d);
+        weekly.set(week.w, current);
       }
       people.set(login, existing);
+      personWeeks.set(login, weekly);
     }
   }
 
   return {
     org,
     sampledRepositories: sampled.length,
-    contributors: [...people.values()].sort((a, b) => b.commits - a.commits).slice(0, 30),
+    contributors: [...people.values()]
+      .map((person) => ({
+        ...person,
+        weeks: [...(personWeeks.get(person.login)?.values() ?? [])]
+          .sort((left, right) => left.week - right.week),
+      }))
+      .sort((a, b) => b.commits - a.commits)
+      .slice(0, 30),
     fetchedAt: new Date().toISOString(),
   };
 }

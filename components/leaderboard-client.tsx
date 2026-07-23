@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useDeferredValue, useMemo, useState } from "react";
 import { formatCompactNumber, formatMomentum } from "@/lib/analytics";
 import { MiniHeatmap } from "@/components/mini-heatmap";
+import { PeopleLeaderboard } from "@/components/people-leaderboard";
 import type { ActivityDay, LeaderboardEntry, LeaderboardSnapshot } from "@/lib/types";
 
 type RankMode = "totalCommits" | "consistency" | "momentum" | "activeDays" | "weekendRatio";
@@ -82,6 +83,7 @@ function FieldNote({
 }
 
 export function LeaderboardClient({ snapshot }: { snapshot: LeaderboardSnapshot }) {
+  const [kind, setKind] = useState<"companies" | "people">("companies");
   const [mode, setMode] = useState<RankMode>("totalCommits");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -115,7 +117,26 @@ export function LeaderboardClient({ snapshot }: { snapshot: LeaderboardSnapshot 
         <h1>Leaderboards</h1>
       </div>
 
-      <div className="leaderboard-filters">
+      <div className="leaderboard-kind-tabs" aria-label="Leaderboard type">
+        <button
+          className={kind === "companies" ? "active" : ""}
+          onClick={() => setKind("companies")}
+          type="button"
+        >
+          Companies
+        </button>
+        <button
+          className={kind === "people" ? "active" : ""}
+          onClick={() => setKind("people")}
+          type="button"
+        >
+          People
+        </button>
+      </div>
+
+      {kind === "companies" ? (
+        <>
+          <div className="leaderboard-filters">
         <label>
           <Search aria-hidden="true" size={16} />
           <input value={query} onChange={(event) => { setQuery(event.target.value); setVisibleCount(10); }} placeholder="Filter companies…" aria-label="Filter companies" />
@@ -199,18 +220,22 @@ export function LeaderboardClient({ snapshot }: { snapshot: LeaderboardSnapshot 
         </section>
       )}
 
-      {selected.length > 0 && (
-        <div className="compare-tray">
-          <span><GitCompareArrows aria-hidden="true" size={17} /> Compare up to 3 companies</span>
-          <div className="compare-selections">
-            {selected.map((org) => {
-              const entry = snapshot.entries.find((item) => item.org === org);
-              return entry ? <button type="button" onClick={() => toggle(org)} key={org}>{entry.name} ×</button> : null;
-            })}
-          </div>
-          <small>{selected.length} / 3 selected</small>
-          <Link className="primary-button" href={`/compare?orgs=${selected.join(",")}`}>Compare <ArrowRight aria-hidden="true" size={15} /></Link>
-        </div>
+          {selected.length > 0 && (
+            <div className="compare-tray">
+              <span><GitCompareArrows aria-hidden="true" size={17} /> Compare up to 3 companies</span>
+              <div className="compare-selections">
+                {selected.map((org) => {
+                  const entry = snapshot.entries.find((item) => item.org === org);
+                  return entry ? <button type="button" onClick={() => toggle(org)} key={org}>{entry.name} ×</button> : null;
+                })}
+              </div>
+              <small>{selected.length} / 3 selected</small>
+              <Link className="primary-button" href={`/compare?orgs=${selected.join(",")}`}>Compare <ArrowRight aria-hidden="true" size={15} /></Link>
+            </div>
+          )}
+        </>
+      ) : (
+        <PeopleLeaderboard />
       )}
     </main>
   );

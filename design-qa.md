@@ -309,4 +309,50 @@ The directory's above-the-fold copy remains unchanged. Browser consoles containe
 
 The above-the-fold copy remains unchanged. The local server returned the leaderboard with HTTP 200 and no terminal errors. Direct comparison with the reported screenshot found no remaining actionable P0, P1, or P2 issue.
 
+## People leaderboard follow-up
+
+### Evidence
+
+- Accepted visual system: `/Users/blakefolgado/.codex/generated_images/019f8fbb-2c89-76b2-8746-cd739cae721a/call_mwmad7lF8eQL9xtSAKd362Hq.png`
+- Desktop people leaderboard: `/Users/blakefolgado/.codex/tmp/open-office-people-qa-2026-07-23/people-desktop.png`
+- Desktop OpenAI/Anthropic comparison: `/Users/blakefolgado/.codex/tmp/open-office-people-qa-2026-07-23/people-compare-desktop.png`
+- Mobile people leaderboard: `/Users/blakefolgado/.codex/tmp/open-office-people-qa-2026-07-23/people-mobile.png`
+- Mobile OpenAI/Anthropic comparison: `/Users/blakefolgado/.codex/tmp/open-office-people-qa-2026-07-23/people-compare-mobile.png`
+- Browser method: Codex in-app browser.
+- Desktop viewport: 1440 × 900 CSS pixels.
+- Mobile viewport: 390 × 844 CSS pixels.
+- Data state: 2,371 public contributors across 81 company repository sets, with 26-week trend history.
+
+### Comparison history
+
+- P1: Company leaderboards could not answer who was shipping inside each company.
+  - Fix: Added a first-class Companies/People switch with person, company, trend, commits, additions, deletions and repository breadth.
+  - Recheck: People loads 20 ranked rows initially and searches the complete 2,371-person index.
+- P1: GitHub contributor statistics included automation users.
+  - Fix: Excluded GitHub `Bot` users, bot/robot/machine/service naming patterns and known automation accounts before ranking.
+  - Recheck: `bors`, `k8s-ci-robot`, `hubot` and `denobot` no longer appear in the visible ranking.
+- P1: Cross-company individual comparison did not exist.
+  - Fix: Added selectable people rows and `/compare/people` with commits, added, deleted, repositories and a 26-week multi-person velocity chart.
+  - Recheck: `@jif-oai` from OpenAI and `@bryan-anthropic` from Anthropic compare successfully; all three chart metrics update.
+- P2: Zero additions/deletions could falsely imply no code changed when GitHub did not provide line data.
+  - Fix: Missing line totals render as an em dash; rankings and charts still use real data where available.
+- P2: The desktop score table would disappear on mobile.
+  - Fix: Added the existing compact mobile metric matrix for people.
+  - Recheck: Five metric rows and both selected people fit at 390px; the velocity chart measures 316px and window-level horizontal scroll remains zero.
+
+### Fidelity ledger
+
+| Surface | Result |
+| --- | --- |
+| Typography | Existing leaderboard table, filter, tab and metric type scales are reused. |
+| Spacing and layout | The new type switch is a two-item underline control. People rows retain the established 68px density and 96px sparkline. |
+| Colour and tokens | Existing GitHub green, semantic red, comparison blue and purple are reused. |
+| Images and assets | GitHub person avatars and existing company avatars are the only images. No decorative assets were introduced. |
+| Copy and content | Visible additions are limited to the requested people controls and metrics. No subtitle, badge or explainer was added. |
+| Responsiveness | The desktop table is 1118px without overflow. Mobile keeps the 1040px data table inside a 352px touch scroller and replaces the comparison table with a compact matrix. |
+| Interaction | Search, company filter, ranking metric, multi-select, compare navigation, add/remove person and commits/added/deleted chart controls are operational. |
+| Data truth | Company means the public repository set a person contributed to, not verified employment. Automation is filtered and unsupported line data is not represented as zero. |
+
+The accepted table system and latest browser screenshots were inspected directly. The implementation preserves the original dark open-table design, adds no above-the-fold explainer copy, and has no remaining actionable P0, P1 or P2 mismatch.
+
 final result: passed
