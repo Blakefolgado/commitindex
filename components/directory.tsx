@@ -64,38 +64,34 @@ export function Directory({ initialCompanies }: { initialCompanies: Company[] })
 
   return (
     <main>
-      <header className="site-header">
-        <a className="wordmark" href="#" aria-label="Open Office home">
-          Open Office
-        </a>
-        <form className="search-form" onSubmit={addCustomCompany}>
-          <Search aria-hidden="true" size={17} />
-          <input
-            aria-label="Search a GitHub organisation"
-            autoCapitalize="none"
-            autoComplete="off"
-            spellCheck={false}
-            placeholder="Search a GitHub organisation"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setVisibleCount(12);
-            }}
-          />
-          {query && (
-            <button className="clear-search" type="button" onClick={() => setQuery("")}>
-              <X aria-hidden="true" size={16} />
-              <span className="sr-only">Clear search</span>
-            </button>
-          )}
-        </form>
-        <a className="about-link" href="#about">
-          About the data
-        </a>
-      </header>
-
       <section className="directory-shell" aria-label="Company GitHub activity directory">
-        <h1 className="sr-only">Public GitHub activity by company</h1>
+        <div className="directory-intro">
+          <div>
+            <h1>How companies ship in public.</h1>
+            <p>Explore the GitHub activity behind 85 of technology&apos;s most interesting organisations.</p>
+          </div>
+          <form className="search-form" onSubmit={addCustomCompany}>
+            <Search aria-hidden="true" size={17} />
+            <input
+              aria-label="Search a GitHub organisation"
+              autoCapitalize="none"
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="Search a company or GitHub organisation"
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setVisibleCount(12);
+              }}
+            />
+            {query && (
+              <button className="clear-search" type="button" onClick={() => setQuery("")}>
+                <X aria-hidden="true" size={16} />
+                <span className="sr-only">Clear search</span>
+              </button>
+            )}
+          </form>
+        </div>
         <nav className="category-nav" aria-label="Company categories">
           {categories.map((item) => (
             <button

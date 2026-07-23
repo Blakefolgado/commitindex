@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Newsreader } from "next/font/google";
+import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 const geist = Geist({
@@ -13,6 +14,7 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://open-office.vercel.app"),
   title: "Open Office — Public company GitHub activity",
   description:
     "Explore public GitHub activity across the world’s most interesting technology companies.",
@@ -35,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geist.variable} ${newsreader.variable}`}>
+        <SiteHeader />
         {children}
       </body>
     </html>

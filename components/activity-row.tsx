@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertCircle, ArrowUpRight, LoaderCircle, RotateCw } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ContributionGrid } from "@/components/contribution-grid";
 import type { Company } from "@/lib/companies";
@@ -69,7 +70,7 @@ export function ActivityRow({ company, eager }: { company: Company; eager: boole
           <div className="avatar-placeholder">{company.name.slice(0, 1)}</div>
         )}
         <div>
-          <h2>{data?.name || company.name}</h2>
+          <h2><Link href={`/company/${company.org}`}>{data?.name || company.name}</Link></h2>
           <p>{data?.description || company.description}</p>
           {data && (
             <div className="company-meta">
@@ -116,6 +117,7 @@ export function ActivityRow({ company, eager }: { company: Company; eager: boole
       </div>
 
       <div className="period-controls" aria-label={`Activity period for ${company.name}`}>
+        <Link className="deep-dive-link" href={`/company/${company.org}`}>Deep dive</Link>
         <button
           className={period === "rolling" ? "active" : ""}
           onClick={() => setPeriod("rolling")}

@@ -8,6 +8,21 @@ export type RepoSummary = {
   url: string;
   stars: number;
   commits: number;
+  language: string | null;
+  pushedAt: string | null;
+};
+
+export type OrganizationStats = {
+  availableDays: number;
+  consistency: number;
+  momentum: number;
+  weekendRatio: number;
+  weekendCommits: number;
+  longestStreak: number;
+  currentStreak: number;
+  averageActiveDay: number;
+  mostActiveWeekday: string;
+  peakDay: ActivityDay;
 };
 
 export type OrganizationActivity = {
@@ -23,6 +38,44 @@ export type OrganizationActivity = {
   sampledRepos: RepoSummary[];
   totalCommits: number;
   activeDays: number;
+  stats: OrganizationStats;
   coverage: string;
   fetchedAt: string;
+};
+
+export type ContributorSummary = {
+  login: string;
+  avatarUrl: string;
+  githubUrl: string;
+  commits: number;
+  repositories: number;
+  additions: number;
+  deletions: number;
+};
+
+export type ContributorsPayload = {
+  org: string;
+  sampledRepositories: number;
+  contributors: ContributorSummary[];
+  fetchedAt: string;
+};
+
+export type LeaderboardEntry = {
+  org: string;
+  name: string;
+  category: string;
+  description: string;
+  avatarUrl: string;
+  totalCommits: number;
+  activeDays: number;
+  stats: OrganizationStats;
+  topRepo: RepoSummary | null;
+  activity: ActivityDay[];
+  fetchedAt: string;
+};
+
+export type LeaderboardSnapshot = {
+  generatedAt: string;
+  source: string;
+  entries: LeaderboardEntry[];
 };

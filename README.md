@@ -20,6 +20,26 @@ The grid:
 It is a view of public open-source activity, not a measure of company size or
 employee productivity.
 
+## Deep dives
+
+- `/company/[org]` adds shipping patterns, repository pulse and contributor
+  rankings aggregated across the same repository sample.
+- `/leaderboards` ranks the curated directory by commits, consistency,
+  momentum, active days and weekend activity.
+- `/compare` compares up to three organisations using live cached data.
+- Company pages render a custom 1200×630 Open Graph image from the same data.
+
+The leaderboard uses a checked-in snapshot so visitors do not trigger hundreds
+of GitHub API requests. Refresh it before a release with:
+
+```bash
+pnpm leaderboard:generate
+```
+
+The UI displays the snapshot's real generation date. A zero GitHub statistics
+response is shown as unavailable data, not as proof that a company shipped
+nothing.
+
 ## Local development
 
 ```bash

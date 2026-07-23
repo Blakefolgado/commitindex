@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "leaderboard:generate": "node scripts/generate-leaderboard.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

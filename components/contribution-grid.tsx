@@ -2,7 +2,7 @@
 
 import type { ActivityDay } from "@/lib/types";
 
-type Period = "rolling" | "current" | "previous";
+export type Period = "rolling" | "current" | "previous";
 
 const colors = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"];
 
