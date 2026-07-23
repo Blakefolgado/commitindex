@@ -193,4 +193,41 @@ GitHub's commit-activity source provides approximately the latest 12 months. The
 
 The directory's above-the-fold copy remains unchanged. Browser consoles contained no warnings or errors, and no actionable P0, P1, or P2 findings remain.
 
+## Lines-changed comparison follow-up
+
+### Evidence
+
+- Accepted visual system: `/Users/blakefolgado/.codex/generated_images/019f8fbb-2c89-76b2-8746-cd739cae721a/call_mwmad7lF8eQL9xtSAKd362Hq.png`
+- Desktop company lines view: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/16-lines-company-desktop.png`
+- Mobile lines comparison: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/17-lines-compare-mobile.png`
+- Browser method: Codex in-app browser.
+- Desktop viewport: 1440 × 900 CSS pixels at density 1.
+- Mobile viewport: 390 × 844 CSS pixels at density 1.
+- State: Vercel company lines view and Vercel/Stripe monthly lines comparison with authenticated live GitHub data.
+
+### Metric definitions
+
+- Lines changed: additions plus the absolute value of deletions.
+- `/week`: average across the latest four GitHub weekly aggregates.
+- `/month`: total across the latest four GitHub weekly aggregates.
+- `/year`: total across the latest 52 GitHub weekly aggregates.
+- Line acceleration: latest four weeks compared with the preceding four weeks.
+- Monthly bars: weekly line totals grouped into their 12 available calendar months.
+
+GitHub excludes repositories with 10,000 or more commits from code-frequency results. Unsupported sampled repositories are excluded rather than counted as zero. In the verified state, line data loaded for 5 Vercel sampled repositories and 7 Stripe sampled repositories.
+
+### Fidelity ledger
+
+| Surface | Result |
+| --- | --- |
+| Typography | The new metric controls use the existing 10px chart-control type. Line totals reuse established tabular stat sizing. |
+| Spacing and layout | `Commits / Lines` sits beside `Weekly / Monthly` inside the existing toolbar. No new chart, panel, subtitle, or explainer was added. |
+| Colour and tokens | Existing selected-control, GitHub green, comparison blue, positive, and negative tokens are reused without introducing a new palette. |
+| Images and assets | No assets were added. Line charts are semantic live-data UI. |
+| Copy and content | Visible additions are limited to `Lines` and `Lines changed`. In the comparison score, `Weekend` was replaced rather than adding another row or column. |
+| Responsiveness | Both two-option controls fit on one line at 390px. The comparison plot remains 620px inside a 332px scroller; document width remains 390px. |
+| Interaction | Commits/Lines and Weekly/Monthly combinations were exercised. Mobile horizontal scroll reached 288px. Exact additions and deletions are available in desktop bar titles. |
+
+The directory's above-the-fold copy remains unchanged. Browser consoles contained no warnings or errors. Direct comparison of the accepted visual system and latest implementation found no actionable P0, P1, or P2 mismatch.
+
 final result: passed

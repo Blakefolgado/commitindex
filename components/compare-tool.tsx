@@ -14,7 +14,11 @@ const comparisonMetrics = [
   { label: "Active days", value: (item: OrganizationActivity) => item.activeDays.toLocaleString() },
   { label: "Consistency", value: (item: OrganizationActivity) => `${item.stats.consistency}%` },
   { label: "Momentum", value: (item: OrganizationActivity) => formatMomentum(item.stats.momentum) },
-  { label: "Weekend", value: (item: OrganizationActivity) => `${item.stats.weekendRatio}%` },
+  {
+    label: "Lines changed",
+    value: (item: OrganizationActivity) =>
+      item.codeFrequencyRepos > 0 ? item.totalLinesChanged.toLocaleString() : "—",
+  },
 ];
 
 export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
@@ -55,7 +59,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
         delete next[org];
         return next;
       });
-      fetch(`/api/organizations/${encodeURIComponent(org)}?v=2`, { signal: controller.signal })
+      fetch(`/api/organizations/${encodeURIComponent(org)}?v=3`, { signal: controller.signal })
         .then(async (response) => {
           const payload = await response.json();
           if (!response.ok) throw new Error(payload.error);
@@ -211,7 +215,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
       })}
 
       <section className="comparison-scoreboard">
-        <div className="scoreboard-labels"><span>Company</span><span>Commits</span><span>Active days</span><span>Consistency</span><span>Momentum</span><span>Weekend</span></div>
+        <div className="scoreboard-labels"><span>Company</span><span>Commits</span><span>Active days</span><span>Consistency</span><span>Momentum</span><span>Lines changed</span></div>
         {orgs.map((org) => {
           const item = data[org];
           return item ? (
@@ -225,7 +229,9 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
               <strong>{item.activeDays}</strong>
               <strong>{item.stats.consistency}%</strong>
               <strong className={item.stats.momentum >= 0 ? "positive" : "negative"}>{formatMomentum(item.stats.momentum)}</strong>
-              <strong>{item.stats.weekendRatio}%</strong>
+              <strong title={`${item.codeFrequencyRepos} of ${item.sampledRepos.length} sampled repositories provide line data`}>
+                {item.codeFrequencyRepos > 0 ? item.totalLinesChanged.toLocaleString() : "—"}
+              </strong>
             </Link>
           ) : (
             <div className="scoreboard-loading" key={org}><LoaderCircle className="spin" size={17} /> Loading {org}…</div>
@@ -276,8 +282,11 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
             ariaLabel={`Commit velocity for ${loadedItems.map((item) => item.name).join(", ")}`}
             series={loadedItems.map((item) => ({
               activity: item.activity,
+              codeFrequency: item.codeFrequency,
+              codeFrequencyRepos: item.codeFrequencyRepos,
               momentum: item.stats.momentum,
               name: item.name,
+              sampledRepositories: item.sampledRepos.length,
             }))}
           />
         </section>

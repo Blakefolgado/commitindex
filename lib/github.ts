@@ -3,6 +3,7 @@ import "server-only";
 import { calculateOrganizationStats } from "@/lib/analytics";
 import type {
   ActivityDay,
+  CodeFrequencyWeek,
   ContributorSummary,
   ContributorsPayload,
   OrganizationActivity,
@@ -39,6 +40,8 @@ type CommitWeek = {
   total: number;
   days: number[];
 };
+
+type CodeFrequencyTuple = [number, number, number];
 
 type GitHubContributor = {
   author: {
@@ -84,8 +87,8 @@ async function githubFetch<T>(
   });
 
   let response = await request();
-  if (allowProcessing && response.status === 202) {
-    await new Promise((resolve) => setTimeout(resolve, 900));
+  for (let attempt = 1; allowProcessing && response.status === 202 && attempt <= 2; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 900 * attempt));
     response = await request();
   }
   if (!response.ok) throw new GitHubRequestError(response.status);
@@ -114,6 +117,18 @@ async function getCommitActivity(org: string, repo: GitHubRepo) {
     return Array.isArray(weeks) ? weeks : [];
   } catch {
     return [];
+  }
+}
+
+async function getCodeFrequency(org: string, repo: GitHubRepo) {
+  try {
+    const weeks = await githubFetch<CodeFrequencyTuple[] | Record<string, never>>(
+      `/repos/${encodeURIComponent(org)}/${encodeURIComponent(repo.name)}/stats/code_frequency?source=lines-v1`,
+      true,
+    );
+    return { loaded: true, weeks: Array.isArray(weeks) ? weeks : [] };
+  } catch {
+    return { loaded: false, weeks: [] };
   }
 }
 
@@ -155,15 +170,48 @@ function aggregateActivity(results: { repo: GitHubRepo; weeks: CommitWeek[] }[])
   };
 }
 
+function aggregateCodeFrequency(
+  results: { codeFrequency: { loaded: boolean; weeks: CodeFrequencyTuple[] } }[],
+) {
+  const weekly = new Map<number, CodeFrequencyWeek>();
+  const codeFrequencyRepos = results.filter((result) => result.codeFrequency.loaded).length;
+  const cutoff = Math.floor((Date.now() - 370 * 86400 * 1000) / 1000);
+
+  for (const { codeFrequency } of results) {
+    for (const [week, additions, deletions] of codeFrequency.weeks) {
+      if (week < cutoff) continue;
+      const existing = weekly.get(week) ?? { week, additions: 0, deletions: 0 };
+      existing.additions += Math.max(0, additions);
+      existing.deletions += Math.abs(deletions);
+      weekly.set(week, existing);
+    }
+  }
+
+  const weeks = [...weekly.values()].sort((left, right) => left.week - right.week);
+  return {
+    codeFrequency: weeks,
+    codeFrequencyRepos,
+    totalLinesChanged: weeks.reduce(
+      (sum, week) => sum + week.additions + week.deletions,
+      0,
+    ),
+  };
+}
+
 export async function getOrganizationActivity(rawOrg: string): Promise<OrganizationActivity> {
   const org = rawOrg.trim().toLowerCase();
   if (!isValidOrg(org)) throw new GitHubRequestError(400);
   const { profile, sampled } = await getOrganization(org);
-  const results = await Promise.all(sampled.map(async (repo) => ({
-    repo,
-    weeks: await getCommitActivity(org, repo),
-  })));
+  const results = await Promise.all(sampled.map(async (repo) => {
+    const [weeks, codeFrequency] = await Promise.all([
+      getCommitActivity(org, repo),
+      getCodeFrequency(org, repo),
+    ]);
+    return { repo, weeks, codeFrequency };
+  }));
   const { activity, repoSummaries } = aggregateActivity(results);
+  const { codeFrequency, codeFrequencyRepos, totalLinesChanged } =
+    aggregateCodeFrequency(results);
   const totalCommits = activity.reduce((sum, day) => sum + day.count, 0);
   return {
     org: profile.login,
@@ -175,8 +223,11 @@ export async function getOrganizationActivity(rawOrg: string): Promise<Organizat
     publicRepos: profile.public_repos,
     followers: profile.followers,
     activity,
+    codeFrequency,
+    codeFrequencyRepos,
     sampledRepos: repoSummaries,
     totalCommits,
+    totalLinesChanged,
     activeDays: activity.filter((day) => day.count > 0).length,
     stats: calculateOrganizationStats(activity),
     coverage: `${repoSummaries.length} most recently active public repositories`,

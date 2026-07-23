@@ -3,6 +3,12 @@ export type ActivityDay = {
   count: number;
 };
 
+export type CodeFrequencyWeek = {
+  week: number;
+  additions: number;
+  deletions: number;
+};
+
 export type RepoSummary = {
   name: string;
   url: string;
@@ -35,8 +41,11 @@ export type OrganizationActivity = {
   publicRepos: number;
   followers: number;
   activity: ActivityDay[];
+  codeFrequency: CodeFrequencyWeek[];
+  codeFrequencyRepos: number;
   sampledRepos: RepoSummary[];
   totalCommits: number;
+  totalLinesChanged: number;
   activeDays: number;
   stats: OrganizationStats;
   coverage: string;

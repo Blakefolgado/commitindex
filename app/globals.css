@@ -1001,6 +1001,11 @@ footer > span {
   display: flex;
 }
 
+.velocity-controls {
+  display: flex;
+  gap: 8px;
+}
+
 .velocity-resolution button {
   background: var(--surface-raised);
   border: 1px solid var(--border);
@@ -1023,6 +1028,11 @@ footer > span {
 .velocity-resolution button:hover,
 .velocity-resolution button.active {
   color: var(--text);
+}
+
+.velocity-resolution button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .velocity-resolution button.active {
@@ -2074,6 +2084,10 @@ footer > span {
 
   .velocity-resolution {
     align-self: flex-start;
+  }
+
+  .velocity-controls {
+    flex-wrap: wrap;
   }
 
   .comparison-velocity {

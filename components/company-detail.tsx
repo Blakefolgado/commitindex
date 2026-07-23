@@ -113,8 +113,11 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
           ariaLabel={`${data.name} commit velocity`}
           series={[{
             activity: data.activity,
+            codeFrequency: data.codeFrequency,
+            codeFrequencyRepos: data.codeFrequencyRepos,
             momentum: data.stats.momentum,
             name: data.name,
+            sampledRepositories: data.sampledRepos.length,
           }]}
         />
       </section>
