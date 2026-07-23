@@ -230,4 +230,42 @@ GitHub excludes repositories with 10,000 or more commits from code-frequency res
 
 The directory's above-the-fold copy remains unchanged. Browser consoles contained no warnings or errors. Direct comparison of the accepted visual system and latest implementation found no actionable P0, P1, or P2 mismatch.
 
+## Deleted-lines visibility follow-up
+
+### Evidence
+
+- Accepted visual system: `/Users/blakefolgado/.codex/generated_images/019f8fbb-2c89-76b2-8746-cd739cae721a/call_mwmad7lF8eQL9xtSAKd362Hq.png`
+- Desktop company deleted-lines view: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/20-deleted-company-desktop.png`
+- Mobile deleted-lines comparison: `/Users/blakefolgado/.codex/tmp/open-office-chart-qa-2026-07-23/21-deleted-compare-mobile.png`
+- Browser method: Codex in-app browser.
+- Desktop viewport: 1440 × 900 CSS pixels at density 1.
+- Mobile viewport: 390 × 844 CSS pixels at density 1.
+- State: Vercel monthly deleted-lines view and Vercel/Stripe monthly deleted-lines comparison with authenticated live GitHub data.
+
+### Comparison history
+
+- P1: Deleted lines were available only inside a combined line-change total and desktop hover title.
+  - Fix: Replaced the combined metric switch with direct `Commits`, `Added`, and `Deleted` modes.
+  - Recheck: Selecting `Deleted` updates bars, `/week`, `/month`, `/year`, acceleration, chart accessibility text, and exact bar titles.
+- P1: The comparison score did not expose deleted-line totals.
+  - Fix: Replaced `Lines changed` with `Lines deleted`, preserving the same row and column count.
+  - Recheck: Mobile shows Vercel and Stripe deleted totals in the primary comparison matrix.
+- P2: A third metric control could have wrapped or reduced chart width on mobile.
+  - Fix: Kept all metric and interval controls in the existing 332px toolbar.
+  - Recheck: All five controls fit on one 28px row at 390px; document width remains 390px and chart scroll reaches 288px.
+
+### Fidelity ledger
+
+| Surface | Result |
+| --- | --- |
+| Typography | Added and Deleted use the existing 10px control typography and established compact stat scale. |
+| Spacing and layout | No new section or panel was introduced. One extra metric button fits inside the existing toolbar. |
+| Colour and tokens | Single-company deleted bars use the existing GitHub red token. Multi-company bars retain company colours so comparison identity remains clear. |
+| Images and assets | No assets changed. All states remain code-native live-data UI. |
+| Copy and content | `Lines` became `Added` and `Deleted`; `Lines changed` became `Lines deleted`. No subtitle or explainer was added. |
+| Responsiveness | The primary mobile matrix, toolbar, and scrollable plot remain contained at 390px. |
+| Interaction | Commits, Added, and Deleted modes were exercised with weekly/monthly controls. Exact additions and deletions remain in desktop bar titles. |
+
+The directory's above-the-fold copy remains unchanged. Browser consoles contained no warnings or errors. Direct comparison of the accepted visual system and latest implementation found no actionable P0, P1, or P2 mismatch.
+
 final result: passed

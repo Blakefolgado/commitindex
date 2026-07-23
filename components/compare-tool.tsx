@@ -15,9 +15,9 @@ const comparisonMetrics = [
   { label: "Consistency", value: (item: OrganizationActivity) => `${item.stats.consistency}%` },
   { label: "Momentum", value: (item: OrganizationActivity) => formatMomentum(item.stats.momentum) },
   {
-    label: "Lines changed",
+    label: "Lines deleted",
     value: (item: OrganizationActivity) =>
-      item.codeFrequencyRepos > 0 ? item.totalLinesChanged.toLocaleString() : "—",
+      item.codeFrequencyRepos > 0 ? item.totalDeletions.toLocaleString() : "—",
   },
 ];
 
@@ -59,7 +59,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
         delete next[org];
         return next;
       });
-      fetch(`/api/organizations/${encodeURIComponent(org)}?v=3`, { signal: controller.signal })
+      fetch(`/api/organizations/${encodeURIComponent(org)}?v=4`, { signal: controller.signal })
         .then(async (response) => {
           const payload = await response.json();
           if (!response.ok) throw new Error(payload.error);
@@ -215,7 +215,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
       })}
 
       <section className="comparison-scoreboard">
-        <div className="scoreboard-labels"><span>Company</span><span>Commits</span><span>Active days</span><span>Consistency</span><span>Momentum</span><span>Lines changed</span></div>
+        <div className="scoreboard-labels"><span>Company</span><span>Commits</span><span>Active days</span><span>Consistency</span><span>Momentum</span><span>Lines deleted</span></div>
         {orgs.map((org) => {
           const item = data[org];
           return item ? (
@@ -230,7 +230,7 @@ export function CompareTool({ initialOrgs }: { initialOrgs: string[] }) {
               <strong>{item.stats.consistency}%</strong>
               <strong className={item.stats.momentum >= 0 ? "positive" : "negative"}>{formatMomentum(item.stats.momentum)}</strong>
               <strong title={`${item.codeFrequencyRepos} of ${item.sampledRepos.length} sampled repositories provide line data`}>
-                {item.codeFrequencyRepos > 0 ? item.totalLinesChanged.toLocaleString() : "—"}
+                {item.codeFrequencyRepos > 0 ? item.totalDeletions.toLocaleString() : "—"}
               </strong>
             </Link>
           ) : (

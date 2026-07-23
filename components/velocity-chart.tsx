@@ -17,7 +17,8 @@ type VelocityPoint = {
   total: number;
 };
 
-type VelocityMetric = "commits" | "lines";
+type LineMetric = "additions" | "deletions";
+type VelocityMetric = "commits" | LineMetric;
 type VelocityResolution = "weeks" | "months";
 
 export type VelocitySeries = {
@@ -108,6 +109,7 @@ export function getMonthlyVelocity(activity: ActivityDay[], monthCount = 12): Ve
 
 function getWeeklyLineVelocity(
   codeFrequency: CodeFrequencyWeek[],
+  metric: LineMetric,
   weekCount = 12,
 ): VelocityPoint[] {
   const available = codeFrequency
@@ -151,13 +153,14 @@ function getWeeklyLineVelocity(
         year: "numeric",
         timeZone: "UTC",
       })}`,
-      total: additions + deletions,
+      total: metric === "additions" ? additions : deletions,
     };
   });
 }
 
 function getMonthlyLineVelocity(
   codeFrequency: CodeFrequencyWeek[],
+  metric: LineMetric,
   monthCount = 12,
 ): VelocityPoint[] {
   const available = codeFrequency
@@ -204,7 +207,7 @@ function getMonthlyLineVelocity(
     deletions,
     label,
     title,
-    total: additions + deletions,
+    total: metric === "additions" ? additions : deletions,
   }));
 }
 
@@ -229,8 +232,8 @@ export function getVelocitySummary(activity: ActivityDay[]) {
   };
 }
 
-function getLineVelocitySummary(codeFrequency: CodeFrequencyWeek[]) {
-  const weeks = getWeeklyLineVelocity(codeFrequency, 52);
+function getLineVelocitySummary(codeFrequency: CodeFrequencyWeek[], metric: LineMetric) {
+  const weeks = getWeeklyLineVelocity(codeFrequency, metric, 52);
   const recent = weeks.slice(-4).reduce((sum, week) => sum + week.total, 0);
   const previous = weeks.slice(-8, -4).reduce((sum, week) => sum + week.total, 0);
 
@@ -255,10 +258,10 @@ export function VelocityChart({
   const [resolution, setResolution] = useState<VelocityResolution>("weeks");
   const hasLineData = series.some((item) => item.codeFrequency.length > 0);
   const chartSeries = series.map((item) => {
-    if (metric === "lines") {
+    if (metric !== "commits") {
       return resolution === "weeks"
-        ? getWeeklyLineVelocity(item.codeFrequency)
-        : getMonthlyLineVelocity(item.codeFrequency);
+        ? getWeeklyLineVelocity(item.codeFrequency, metric)
+        : getMonthlyLineVelocity(item.codeFrequency, metric);
     }
     return resolution === "weeks"
       ? getWeeklyVelocity(item.activity)
@@ -270,10 +273,14 @@ export function VelocityChart({
   const summaries = series.map((item) =>
     metric === "commits"
       ? { ...getVelocitySummary(item.activity), acceleration: item.momentum }
-      : getLineVelocitySummary(item.codeFrequency),
+      : getLineVelocitySummary(item.codeFrequency, metric),
   );
   const singleSummary = summaries[0] ?? null;
-  const unit = metric === "commits" ? "commits" : "lines changed";
+  const unit = metric === "commits"
+    ? "commits"
+    : metric === "additions"
+      ? "lines added"
+      : "lines deleted";
   const lineCoverage = series.length === 1
     ? `${series[0].codeFrequencyRepos} of ${series[0].sampledRepositories} sampled repositories provide line data`
     : "Line totals include GitHub-supported sampled repositories";
@@ -297,7 +304,7 @@ export function VelocityChart({
               <i style={{ backgroundColor: SERIES_COLORS[index] }} />
               <strong>{item.name}</strong>
               <small>
-                {item.codeFrequency.length === 0 && metric === "lines"
+                {item.codeFrequency.length === 0 && metric !== "commits"
                   ? "Unavailable"
                   : `${formatCompactNumber(
                     resolution === "weeks"
@@ -316,17 +323,17 @@ export function VelocityChart({
         )}
         <div className="velocity-controls">
           <div className="velocity-resolution" role="group" aria-label="Chart metric">
-            {(["commits", "lines"] as const).map((value) => (
+            {(["commits", "additions", "deletions"] as const).map((value) => (
               <button
                 aria-pressed={metric === value}
                 className={metric === value ? "active" : ""}
-                disabled={value === "lines" && !hasLineData}
+                disabled={value !== "commits" && !hasLineData}
                 key={value}
                 onClick={() => setMetric(value)}
-                title={value === "lines" ? lineCoverage : undefined}
+                title={value !== "commits" ? lineCoverage : undefined}
                 type="button"
               >
-                {value === "commits" ? "Commits" : "Lines"}
+                {value === "commits" ? "Commits" : value === "additions" ? "Added" : "Deleted"}
               </button>
             ))}
           </div>
@@ -362,12 +369,15 @@ export function VelocityChart({
                       className={total === 0 ? "empty" : ""}
                       key={item.name}
                       style={{
-                        backgroundColor: SERIES_COLORS[seriesIndex],
+                        backgroundColor:
+                          metric === "deletions" && series.length === 1
+                            ? "#f85149"
+                            : SERIES_COLORS[seriesIndex],
                         height: `${Math.max(2, (total / maximum) * 100)}%`,
                       }}
                       title={
-                        metric === "lines"
-                          ? `${item.name}: ${total.toLocaleString()} lines changed (+${(point.additions ?? 0).toLocaleString()} / -${(point.deletions ?? 0).toLocaleString()}) · ${point.title}`
+                        metric !== "commits"
+                          ? `${item.name}: ${total.toLocaleString()} ${unit} (+${(point.additions ?? 0).toLocaleString()} / -${(point.deletions ?? 0).toLocaleString()}) · ${point.title}`
                           : `${item.name}: ${total.toLocaleString()} commits · ${point.title}`
                       }
                     />

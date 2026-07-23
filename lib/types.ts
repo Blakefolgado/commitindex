@@ -45,6 +45,8 @@ export type OrganizationActivity = {
   codeFrequencyRepos: number;
   sampledRepos: RepoSummary[];
   totalCommits: number;
+  totalAdditions: number;
+  totalDeletions: number;
   totalLinesChanged: number;
   activeDays: number;
   stats: OrganizationStats;

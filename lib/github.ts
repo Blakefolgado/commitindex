@@ -188,13 +188,14 @@ function aggregateCodeFrequency(
   }
 
   const weeks = [...weekly.values()].sort((left, right) => left.week - right.week);
+  const totalAdditions = weeks.reduce((sum, week) => sum + week.additions, 0);
+  const totalDeletions = weeks.reduce((sum, week) => sum + week.deletions, 0);
   return {
     codeFrequency: weeks,
     codeFrequencyRepos,
-    totalLinesChanged: weeks.reduce(
-      (sum, week) => sum + week.additions + week.deletions,
-      0,
-    ),
+    totalAdditions,
+    totalDeletions,
+    totalLinesChanged: totalAdditions + totalDeletions,
   };
 }
 
@@ -210,8 +211,13 @@ export async function getOrganizationActivity(rawOrg: string): Promise<Organizat
     return { repo, weeks, codeFrequency };
   }));
   const { activity, repoSummaries } = aggregateActivity(results);
-  const { codeFrequency, codeFrequencyRepos, totalLinesChanged } =
-    aggregateCodeFrequency(results);
+  const {
+    codeFrequency,
+    codeFrequencyRepos,
+    totalAdditions,
+    totalDeletions,
+    totalLinesChanged,
+  } = aggregateCodeFrequency(results);
   const totalCommits = activity.reduce((sum, day) => sum + day.count, 0);
   return {
     org: profile.login,
@@ -227,6 +233,8 @@ export async function getOrganizationActivity(rawOrg: string): Promise<Organizat
     codeFrequencyRepos,
     sampledRepos: repoSummaries,
     totalCommits,
+    totalAdditions,
+    totalDeletions,
     totalLinesChanged,
     activeDays: activity.filter((day) => day.count > 0).length,
     stats: calculateOrganizationStats(activity),
