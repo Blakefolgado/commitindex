@@ -1,15 +1,12 @@
-"use client";
-
-import { ArrowRight, GitCompareArrows, LoaderCircle, Search } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import Link from "next/link";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import type {
   ContributorWeek,
   PeopleLeaderboardEntry,
   PeopleLeaderboardSnapshot,
 } from "@/lib/types";
 
-type PeopleRankMode = "commits" | "additions" | "deletions" | "repositories";
+export type PeopleRankMode = "commits" | "additions" | "deletions" | "repositories";
 
 const peopleModes: { value: PeopleRankMode; label: string }[] = [
   { value: "commits", label: "Commits" },
@@ -68,226 +65,174 @@ function PersonTrend({
   );
 }
 
-export function PeopleLeaderboard() {
-  const [snapshot, setSnapshot] = useState<PeopleLeaderboardSnapshot | null>(null);
-  const [error, setError] = useState("");
-  const [retryVersion, setRetryVersion] = useState(0);
-  const [query, setQuery] = useState("");
-  const [company, setCompany] = useState("All companies");
-  const [mode, setMode] = useState<PeopleRankMode>("commits");
-  const [selected, setSelected] = useState<string[]>([]);
-  const [visibleCount, setVisibleCount] = useState(20);
-  const deferredQuery = useDeferredValue(query.toLowerCase().trim());
+function peopleUrl({
+  company,
+  limit,
+  mode,
+  query,
+}: {
+  company: string;
+  limit?: number;
+  mode: PeopleRankMode;
+  query: string;
+}) {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (company !== "All companies") params.set("company", company);
+  if (mode !== "commits") params.set("mode", mode);
+  if (limit) params.set("limit", String(limit));
+  const search = params.toString();
+  return search ? `/leaderboards/people?${search}` : "/leaderboards/people";
+}
 
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/people", { signal: controller.signal })
-      .then(async (response) => {
-        const payload = await response.json();
-        if (!response.ok) throw new Error(payload.error || "Could not load people");
-        return payload as PeopleLeaderboardSnapshot;
-      })
-      .then(setSnapshot)
-      .catch((reason) => {
-        if (reason.name !== "AbortError") {
-          setError(reason instanceof Error ? reason.message : "Could not load people");
-        }
-      });
-    return () => controller.abort();
-  }, [retryVersion]);
-
-  const companies = useMemo(() => [
+export function PeopleLeaderboard({
+  company,
+  limit,
+  mode,
+  query,
+  snapshot,
+}: {
+  company: string;
+  limit: number;
+  mode: PeopleRankMode;
+  query: string;
+  snapshot: PeopleLeaderboardSnapshot;
+}) {
+  const normalizedQuery = query.toLowerCase().trim();
+  const companies = [
     "All companies",
-    ...new Set(snapshot?.entries.map((entry) => entry.company) ?? []),
-  ], [snapshot]);
-  const entries = useMemo(() => (snapshot?.entries ?? [])
+    ...new Set(snapshot.entries.map((entry) => entry.company)),
+  ];
+  const entries = snapshot.entries
     .filter((entry) => company === "All companies" || entry.company === company)
     .filter((entry) => (
-      !deferredQuery
-      || `${entry.login} ${entry.company} ${entry.org}`.toLowerCase().includes(deferredQuery)
+      !normalizedQuery
+      || `${entry.login} ${entry.company} ${entry.org}`.toLowerCase().includes(normalizedQuery)
     ))
-    .toSorted((left, right) => right[mode] - left[mode]), [
-    company,
-    deferredQuery,
-    mode,
-    snapshot,
-  ]);
-
-  function toggle(id: string) {
-    setSelected((current) => current.includes(id)
-      ? current.filter((item) => item !== id)
-      : current.length < 3 ? [...current, id] : current);
-  }
-
-  if (!snapshot && !error) {
-    return (
-      <section className="leaderboard-panel people-loading">
-        <LoaderCircle className="spin" aria-hidden="true" size={17} />
-        Loading people…
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="leaderboard-panel people-loading" role="alert">
-        <span>{error}</span>
-        <button
-          type="button"
-          onClick={() => {
-            setError("");
-            setSnapshot(null);
-            setRetryVersion((current) => current + 1);
-          }}
-        >
-          Retry
-        </button>
-      </section>
-    );
-  }
+    .toSorted((left, right) => right[mode] - left[mode]);
 
   return (
-    <>
-      <div className="leaderboard-filters">
+    <main className="leaderboard-shell">
+      <div className="page-title">
+        <h1>Leaderboards</h1>
+      </div>
+
+      <div className="leaderboard-kind-tabs" aria-label="Leaderboard type">
+        <Link href="/leaderboards">Companies</Link>
+        <Link className="active" href="/leaderboards/people">People</Link>
+      </div>
+
+      <form action="/leaderboards/people" className="leaderboard-filters" method="get">
         <label>
           <Search aria-hidden="true" size={16} />
           <input
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setVisibleCount(20);
-            }}
-            placeholder="Filter people…"
             aria-label="Filter people"
+            defaultValue={query}
+            name="q"
+            placeholder="Filter people…"
           />
         </label>
-        <select
-          value={company}
-          onChange={(event) => {
-            setCompany(event.target.value);
-            setVisibleCount(20);
-          }}
-          aria-label="Filter by company"
-        >
+        <select defaultValue={company} name="company" aria-label="Filter by company">
           {companies.map((item) => <option key={item}>{item}</option>)}
         </select>
-      </div>
+        <input name="mode" type="hidden" value={mode} />
+        <button className="primary-button" type="submit">Filter</button>
+      </form>
 
       <div className="ranking-tabs people-ranking-tabs" aria-label="People leaderboard measure">
         {peopleModes.map((item) => (
-          <button
+          <Link
             className={mode === item.value ? "active" : ""}
-            onClick={() => {
-              setMode(item.value);
-              setVisibleCount(20);
-            }}
-            type="button"
+            href={peopleUrl({ company, mode: item.value, query })}
             key={item.value}
           >
             {item.label}
-          </button>
+          </Link>
         ))}
       </div>
 
-      <section className="leaderboard-panel">
-        <div className="leaderboard-table-wrap">
-          <table className="leaderboard-table people-table">
-            <colgroup>
-              <col className="people-col-rank" />
-              <col className="people-col-person" />
-              <col className="people-col-company" />
-              <col className="people-col-trend" />
-              <col className="people-col-commits" />
-              <col className="people-col-added" />
-              <col className="people-col-deleted" />
-              <col className="people-col-repos" />
-              <col className="people-col-compare" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Person</th>
-                <th title="Company repository set, not verified employment">Company</th>
-                <th>12 week trend</th>
-                <th>Commits</th>
-                <th>Added</th>
-                <th>Deleted</th>
-                <th>Repos</th>
-                <th><span className="sr-only">Compare</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.slice(0, visibleCount).map((person, index) => (
-                <tr className={selected.includes(person.id) ? "selected" : ""} key={person.id}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <a className="leader-person" href={person.githubUrl} target="_blank" rel="noreferrer">
-                      {/* GitHub avatars are public profile assets. */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={person.avatarUrl} alt="" width={30} height={30} />
-                      <strong>@{person.login}</strong>
-                    </a>
-                  </td>
-                  <td>
-                    <Link className="person-company" href={`/company/${person.org}`}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={person.companyAvatarUrl} alt="" width={22} height={22} />
-                      <span>{person.company}</span>
-                    </Link>
-                  </td>
-                  <td><PersonTrend person={person} mode={mode} /></td>
-                  <td>{person.commits.toLocaleString()}</td>
-                  <td>{formatLineMetric(person, "additions")}</td>
-                  <td>{formatLineMetric(person, "deletions")}</td>
-                  <td>{person.repositories}</td>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(person.id)}
-                      onChange={() => toggle(person.id)}
-                      aria-label={`Compare ${person.login} from ${person.company}`}
-                    />
-                  </td>
+      <form action="/compare/people" method="get">
+        <section className="leaderboard-panel">
+          <div className="people-table-actions">
+            <span>{entries.length.toLocaleString()} contributors</span>
+            <button className="primary-button" type="submit">
+              Compare selected <ArrowRight aria-hidden="true" size={14} />
+            </button>
+          </div>
+          <div className="leaderboard-table-wrap">
+            <table className="leaderboard-table people-table">
+              <colgroup>
+                <col className="people-col-rank" />
+                <col className="people-col-person" />
+                <col className="people-col-company" />
+                <col className="people-col-trend" />
+                <col className="people-col-commits" />
+                <col className="people-col-added" />
+                <col className="people-col-deleted" />
+                <col className="people-col-repos" />
+                <col className="people-col-compare" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Person</th>
+                  <th title="Company repository set, not verified employment">Company</th>
+                  <th>12 week trend</th>
+                  <th>Commits</th>
+                  <th>Added</th>
+                  <th>Deleted</th>
+                  <th>Repos</th>
+                  <th><span className="sr-only">Compare</span></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {!entries.length && <p className="panel-status">No people match these filters.</p>}
-        </div>
-      </section>
+              </thead>
+              <tbody>
+                {entries.slice(0, limit).map((person, index) => (
+                  <tr key={person.id}>
+                    <td>{index + 1}</td>
+                    <td>
+                      <a className="leader-person" href={person.githubUrl} target="_blank" rel="noreferrer">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={person.avatarUrl} alt="" width={30} height={30} />
+                        <strong>@{person.login}</strong>
+                      </a>
+                    </td>
+                    <td>
+                      <Link className="person-company" href={`/company/${person.org}`}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={person.companyAvatarUrl} alt="" width={22} height={22} />
+                        <span>{person.company}</span>
+                      </Link>
+                    </td>
+                    <td><PersonTrend person={person} mode={mode} /></td>
+                    <td>{person.commits.toLocaleString()}</td>
+                    <td>{formatLineMetric(person, "additions")}</td>
+                    <td>{formatLineMetric(person, "deletions")}</td>
+                    <td>{person.repositories}</td>
+                    <td>
+                      <input
+                        aria-label={`Compare ${person.login} from ${person.company}`}
+                        name="people"
+                        type="checkbox"
+                        value={person.id}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!entries.length && <p className="panel-status">No people match these filters.</p>}
+          </div>
+        </section>
+      </form>
 
-      {entries.length > visibleCount && (
-        <button
+      {entries.length > limit && (
+        <Link
           className="load-more"
-          type="button"
-          onClick={() => setVisibleCount((count) => count + 30)}
+          href={peopleUrl({ company, limit: limit + 30, mode, query })}
         >
           Show more people
-        </button>
+        </Link>
       )}
-
-      {selected.length > 0 && (
-        <div className="compare-tray">
-          <span><GitCompareArrows aria-hidden="true" size={17} /> Compare up to 3 people</span>
-          <div className="compare-selections">
-            {selected.map((id) => {
-              const person = snapshot?.entries.find((entry) => entry.id === id);
-              return person ? (
-                <button type="button" onClick={() => toggle(id)} key={id}>
-                  @{person.login} ×
-                </button>
-              ) : null;
-            })}
-          </div>
-          <small>{selected.length} / 3 selected</small>
-          <Link
-            className="primary-button"
-            href={`/compare/people?people=${selected.map(encodeURIComponent).join(",")}`}
-          >
-            Compare <ArrowRight aria-hidden="true" size={15} />
-          </Link>
-        </div>
-      )}
-    </>
+    </main>
   );
 }

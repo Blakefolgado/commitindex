@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
-import { getOrganizationActivity } from "@/lib/github";
+import { notFound } from "next/navigation";
+import { getStoredOrganization } from "@/lib/snapshots";
 
 export const runtime = "nodejs";
 export const alt = "Company public GitHub activity on Commit Index";
@@ -10,7 +11,8 @@ const colors = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"];
 
 export default async function Image({ params }: { params: Promise<{ org: string }> }) {
   const { org } = await params;
-  const data = await getOrganizationActivity(org);
+  const data = getStoredOrganization(org);
+  if (!data) notFound();
   let avatarDataUrl = "";
   try {
     const avatarResponse = await fetch(data.avatarUrl, { next: { revalidate: 86400 } });

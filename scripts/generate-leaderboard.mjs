@@ -5,7 +5,8 @@ const companies = [...source.matchAll(/\{ org: "([^"]+)", name: "([^"]+)", categ
   .map((match) => ({ org: match[1], name: match[2], category: match[3], description: match[4] }));
 const baseUrl = process.env.COMMIT_INDEX_API_BASE
   || process.env.OPEN_OFFICE_API_BASE
-  || "https://commitindex.com";
+  || "http://localhost:3000";
+const ingestSecret = process.env.COMMIT_INDEX_INGEST_SECRET || "";
 const incremental = process.env.OPEN_OFFICE_INCREMENTAL === "1";
 const snapshotUrl = new URL("../data/leaderboard.json", import.meta.url);
 const failures = [];
@@ -50,7 +51,9 @@ function calculateStats(activity) {
 async function load(company) {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      const response = await fetch(`${baseUrl}/api/organizations/${company.org}`);
+      const response = await fetch(`${baseUrl}/api/internal/organizations/${company.org}`, {
+        headers: ingestSecret ? { Authorization: `Bearer ${ingestSecret}` } : {},
+      });
       if (!response.ok) throw new Error(`${response.status} ${await response.text()}`);
       const data = await response.json();
       return {

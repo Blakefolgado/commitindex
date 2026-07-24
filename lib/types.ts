@@ -54,6 +54,12 @@ export type OrganizationActivity = {
   fetchedAt: string;
 };
 
+export type OrganizationsSnapshot = {
+  generatedAt: string;
+  source: string;
+  entries: OrganizationActivity[];
+};
+
 export type ContributorSummary = {
   login: string;
   avatarUrl: string;

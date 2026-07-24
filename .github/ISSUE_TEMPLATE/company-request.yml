@@ -1,0 +1,26 @@
+name: Company request
+description: Add a public GitHub organization to Commit Index
+title: "Add company: "
+labels:
+  - company-request
+body:
+  - type: input
+    id: organization
+    attributes:
+      label: GitHub organization
+      placeholder: github.com/company
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - AI
+        - Developer tools
+        - Infrastructure
+        - Fintech
+        - Consumer
+        - Commerce
+    validations:
+      required: true

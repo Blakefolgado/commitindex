@@ -1,38 +1,17 @@
 "use client";
 
-import { LoaderCircle, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
-  FormEvent,
   useDeferredValue,
-  useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { ActivityRow } from "@/components/activity-row";
 import { categories, type Company } from "@/lib/companies";
-import type { LeaderboardSnapshot, OrganizationActivity } from "@/lib/types";
+import type { LeaderboardSnapshot } from "@/lib/types";
 
-const savedCompaniesKey = "open-office-custom-companies";
-const requestCategories = categories.filter((item) => item !== "All");
-
-function parseOrganization(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-
-  try {
-    const url = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
-    if (url.hostname === "github.com" || url.hostname === "www.github.com") {
-      return url.pathname.split("/").filter(Boolean)[0]?.toLowerCase() ?? "";
-    }
-  } catch {
-    // Plain GitHub handles are handled below.
-  }
-
-  return trimmed.replace(/^@/, "").toLowerCase();
-}
+const requestUrl = "https://github.com/Blakefolgado/open-office/issues/new?template=company-request.yml";
 
 export function Directory({
   initialCompanies,
@@ -41,29 +20,9 @@ export function Directory({
   initialCompanies: Company[];
   snapshot: LeaderboardSnapshot;
 }) {
-  const router = useRouter();
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<(typeof categories)[number]>("All");
-  const [customCompanies, setCustomCompanies] = useState<Company[]>([]);
-  const [requestValue, setRequestValue] = useState("");
-  const [requestCategory, setRequestCategory] =
-    useState<(typeof requestCategories)[number]>("Developer tools");
-  const [requestError, setRequestError] = useState("");
-  const [requesting, setRequesting] = useState(false);
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      try {
-        const saved = JSON.parse(localStorage.getItem(savedCompaniesKey) || "[]");
-        if (Array.isArray(saved)) setCustomCompanies(saved);
-      } catch {
-        localStorage.removeItem(savedCompaniesKey);
-      }
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
 
   const snapshotByOrg = useMemo(
     () => new Map(snapshot.entries.map((entry) => [entry.org, entry])),
@@ -71,11 +30,7 @@ export function Directory({
   );
 
   const companies = useMemo(() => {
-    const merged = [...customCompanies, ...initialCompanies].filter(
-      (company, index, all) => all.findIndex((item) => item.org === company.org) === index,
-    );
-
-    return merged.filter((company) => {
+    return initialCompanies.filter((company) => {
       const matchesCategory = category === "All" || company.category === category;
       const matchesQuery =
         !deferredQuery ||
@@ -83,55 +38,7 @@ export function Directory({
         company.org.toLowerCase().includes(deferredQuery);
       return matchesCategory && matchesQuery;
     });
-  }, [category, customCompanies, deferredQuery, initialCompanies]);
-
-  function openRequest(value = "") {
-    setRequestValue(value);
-    setRequestError("");
-    dialogRef.current?.showModal();
-  }
-
-  function closeRequest() {
-    if (!requesting) dialogRef.current?.close();
-  }
-
-  async function submitRequest(event: FormEvent) {
-    event.preventDefault();
-    const org = parseOrganization(requestValue);
-    const validOrg = /^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/.test(org);
-
-    if (!validOrg) {
-      setRequestError("Enter a GitHub organisation handle or URL.");
-      return;
-    }
-
-    setRequesting(true);
-    setRequestError("");
-
-    try {
-      const response = await fetch(`/api/organizations/${encodeURIComponent(org)}`);
-      const data = (await response.json()) as OrganizationActivity & { error?: string };
-      if (!response.ok) throw new Error(data.error || "Could not find that organisation.");
-
-      const company: Company = {
-        org,
-        name: data.name || org,
-        category: requestCategory,
-        description: "",
-      };
-      const saved = [company, ...customCompanies].filter(
-        (item, index, all) => all.findIndex((candidate) => candidate.org === item.org) === index,
-      );
-      setCustomCompanies(saved);
-      localStorage.setItem(savedCompaniesKey, JSON.stringify(saved));
-      dialogRef.current?.close();
-      router.push(`/company/${org}`);
-    } catch (error) {
-      setRequestError(error instanceof Error ? error.message : "Could not find that organisation.");
-    } finally {
-      setRequesting(false);
-    }
-  }
+  }, [category, deferredQuery, initialCompanies]);
 
   return (
     <main>
@@ -159,9 +66,9 @@ export function Directory({
             </form>
             <div className="directory-actions">
               <Link href="/compare">Compare companies</Link>
-              <button className="request-company" type="button" onClick={() => openRequest()}>
+              <a className="request-company" href={requestUrl} target="_blank" rel="noreferrer">
                 Request a company
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -201,9 +108,13 @@ export function Directory({
         ) : (
           <div className="directory-empty">
             <p>No companies match “{query.trim()}”.</p>
-            <button type="button" onClick={() => openRequest(query.trim())}>
+            <a
+              href={`${requestUrl}&title=${encodeURIComponent(`Add company: ${query.trim()}`)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
               Request this company
-            </button>
+            </a>
           </div>
         )}
       </section>
@@ -218,53 +129,6 @@ export function Directory({
         </details>
         <span>GitHub · Updated daily</span>
       </footer>
-
-      <dialog className="request-dialog" ref={dialogRef} onCancel={closeRequest}>
-        <form onSubmit={submitRequest}>
-          <div className="request-dialog-heading">
-            <h2>Request a company</h2>
-            <button type="button" onClick={closeRequest} aria-label="Close request form">
-              <X aria-hidden="true" size={17} />
-            </button>
-          </div>
-          <label>
-            GitHub organisation
-            <input
-              autoCapitalize="none"
-              autoComplete="off"
-              autoFocus
-              placeholder="github.com/company"
-              spellCheck={false}
-              value={requestValue}
-              onChange={(event) => setRequestValue(event.target.value)}
-            />
-          </label>
-          <label>
-            Category
-            <select
-              value={requestCategory}
-              onChange={(event) =>
-                setRequestCategory(event.target.value as (typeof requestCategories)[number])
-              }
-            >
-              {requestCategories.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-          </label>
-          {requestError && <p role="alert">{requestError}</p>}
-          <button className="primary-button" disabled={requesting} type="submit">
-            {requesting ? (
-              <>
-                <LoaderCircle aria-hidden="true" className="spin" size={15} />
-                Checking GitHub…
-              </>
-            ) : (
-              "Open company"
-            )}
-          </button>
-        </form>
-      </dialog>
     </main>
   );
 }

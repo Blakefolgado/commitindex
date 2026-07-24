@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "organizations:generate": "node scripts/generate-organizations.mjs",
     "leaderboard:generate": "node scripts/generate-leaderboard.mjs",
     "people:generate": "node scripts/generate-people.mjs"
   },

@@ -14,10 +14,13 @@ const defaultIds = ["openai:jif-oai", "anthropics:bryan-anthropic"];
 export default async function PeopleComparePage({
   searchParams,
 }: {
-  searchParams: Promise<{ people?: string }>;
+  searchParams: Promise<{ people?: string | string[] }>;
 }) {
   const params = await searchParams;
-  const requested = (params.people || defaultIds.join(","))
+  const peopleParam = Array.isArray(params.people)
+    ? params.people.join(",")
+    : params.people;
+  const requested = (peopleParam || defaultIds.join(","))
     .split(",")
     .map((id) => decodeURIComponent(id).trim().toLowerCase())
     .filter((id, index, all) => (

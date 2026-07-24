@@ -1,10 +1,7 @@
-"use client";
-
-import { ArrowUpRight, GitCompareArrows, LoaderCircle } from "lucide-react";
+import { ArrowUpRight, GitCompareArrows } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { formatCompactNumber, formatMomentum } from "@/lib/analytics";
-import { ContributionGrid, type Period } from "@/components/contribution-grid";
+import { ContributionGridSelector } from "@/components/contribution-grid-selector";
 import { ShareButton } from "@/components/share-button";
 import { VelocityChart } from "@/components/velocity-chart";
 import type { ContributorsPayload, OrganizationActivity } from "@/lib/types";
@@ -26,29 +23,13 @@ function formatRelativeDate(value: string | null) {
   return `${days} days ago`;
 }
 
-export function CompanyDetail({ data }: { data: OrganizationActivity }) {
-  const [period, setPeriod] = useState<Period>("rolling");
-  const [contributors, setContributors] = useState<ContributorsPayload | null>(null);
-  const [contributorError, setContributorError] = useState("");
-  const currentYear = new Date().getFullYear();
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch(`/api/organizations/${encodeURIComponent(data.org)}/contributors`, {
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        const payload = await response.json();
-        if (!response.ok) throw new Error(payload.error || "Could not load contributors");
-        return payload as ContributorsPayload;
-      })
-      .then(setContributors)
-      .catch((error) => {
-        if (error.name !== "AbortError") setContributorError(error.message);
-      });
-    return () => controller.abort();
-  }, [data.org]);
-
+export function CompanyDetail({
+  contributors,
+  data,
+}: {
+  contributors?: ContributorsPayload;
+  data: OrganizationActivity;
+}) {
   const topContributors = contributors?.contributors.slice(0, 7) ?? [];
   const maxContributorCommits = topContributors[0]?.commits || 1;
 
@@ -94,19 +75,8 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
       <section className="activity-panel">
         <div className="section-heading-row">
           <h2>Public shipping activity</h2>
-          <div className="inline-period-controls">
-            {([
-              ["rolling", "Last 12 months"],
-              ["current", String(currentYear)],
-              ["previous", String(currentYear - 1)],
-            ] as const).map(([value, label]) => (
-              <button className={period === value ? "active" : ""} key={value} onClick={() => setPeriod(value)} type="button">
-                {label}
-              </button>
-            ))}
-          </div>
         </div>
-        <ContributionGrid activity={data.activity} org={data.org} period={period} />
+        <ContributionGridSelector activity={data.activity} org={data.org} />
       </section>
 
       <section className="velocity-panel" aria-labelledby="velocity-heading">
@@ -145,10 +115,8 @@ export function CompanyDetail({ data }: { data: OrganizationActivity }) {
                 </a>
               ))}
             </div>
-          ) : contributorError ? (
-            <p className="panel-status">{contributorError}. GitHub sometimes needs time to compute contributor statistics.</p>
           ) : (
-            <p className="panel-status"><LoaderCircle className="spin" aria-hidden="true" size={16} /> Ranking contributors from sampled repositories…</p>
+            <p className="panel-status">No stored contributor statistics.</p>
           )}
         </section>
 

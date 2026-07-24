@@ -447,12 +447,13 @@ a {
   margin: 0;
 }
 
-.directory-empty button {
+.directory-empty a {
   background: none;
   border: 0;
   color: var(--accent);
   cursor: pointer;
   padding: 4px;
+  text-decoration: none;
 }
 
 .request-dialog {
@@ -1228,7 +1229,8 @@ footer > span {
 }
 
 .inline-period-controls button,
-.ranking-tabs button {
+.ranking-tabs button,
+.ranking-tabs a {
   background: var(--surface-raised);
   border: 1px solid var(--border);
   color: var(--muted);
@@ -1236,6 +1238,7 @@ footer > span {
   font-size: 12px;
   min-height: 34px;
   padding: 0 13px;
+  text-decoration: none;
 }
 
 .inline-period-controls button {
@@ -1245,7 +1248,9 @@ footer > span {
 .inline-period-controls button:hover,
 .inline-period-controls button.active,
 .ranking-tabs button:hover,
-.ranking-tabs button.active {
+.ranking-tabs button.active,
+.ranking-tabs a:hover,
+.ranking-tabs a.active {
   color: var(--text);
 }
 
@@ -1397,23 +1402,30 @@ footer > span {
   margin-bottom: 14px;
 }
 
-.leaderboard-kind-tabs button {
+.leaderboard-kind-tabs button,
+.leaderboard-kind-tabs a {
+  align-items: center;
   background: transparent;
   border: 0;
   border-bottom: 1px solid var(--border);
   color: var(--muted);
   cursor: pointer;
+  display: inline-flex;
   font-size: 13px;
   min-height: 34px;
   padding: 0 18px;
+  text-decoration: none;
 }
 
 .leaderboard-kind-tabs button:hover,
-.leaderboard-kind-tabs button.active {
+.leaderboard-kind-tabs button.active,
+.leaderboard-kind-tabs a:hover,
+.leaderboard-kind-tabs a.active {
   color: var(--text);
 }
 
-.leaderboard-kind-tabs button.active {
+.leaderboard-kind-tabs button.active,
+.leaderboard-kind-tabs a.active {
   border-bottom-color: #3fb950;
 }
 
@@ -1453,24 +1465,32 @@ footer > span {
   margin-bottom: 14px;
 }
 
-.ranking-tabs button {
+.ranking-tabs button,
+.ranking-tabs a {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
   border-radius: 0;
   min-width: 135px;
 }
 
-.ranking-tabs button:first-child {
+.ranking-tabs button:first-child,
+.ranking-tabs a:first-child {
   border-radius: 5px 0 0 5px;
 }
 
-.ranking-tabs button:last-child {
+.ranking-tabs button:last-child,
+.ranking-tabs a:last-child {
   border-radius: 0 5px 5px 0;
 }
 
-.ranking-tabs button + button {
+.ranking-tabs button + button,
+.ranking-tabs a + a {
   border-left: 0;
 }
 
-.ranking-tabs button.active {
+.ranking-tabs button.active,
+.ranking-tabs a.active {
   background: #21262d;
 }
 
@@ -1621,8 +1641,24 @@ footer > span {
   cursor: pointer;
 }
 
-.people-ranking-tabs button {
+.people-ranking-tabs button,
+.people-ranking-tabs a {
   min-width: 112px;
+}
+
+.people-table-actions {
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--muted);
+  display: flex;
+  font-size: 11px;
+  justify-content: space-between;
+  min-height: 50px;
+  padding: 0 14px;
+}
+
+.people-table-actions .primary-button {
+  min-height: 32px;
 }
 
 .people-table {
@@ -1805,7 +1841,8 @@ footer > span {
 }
 
 .compare-selections button,
-.compare-picker > button {
+.compare-picker > button,
+.compare-picker > a {
   background: var(--background);
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -1816,9 +1853,39 @@ footer > span {
   padding: 0 10px;
 }
 
-.compare-picker > button:hover {
+.compare-picker > button:hover,
+.compare-picker > a:hover {
   background: var(--surface-raised);
   border-color: #6e7681;
+}
+
+.compare-form {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.compare-selects {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  width: min(720px, 100%);
+}
+
+.compare-selects select {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 12px;
+  min-height: 36px;
+  padding: 0 10px;
+}
+
+.compare-selects select:focus {
+  border-color: var(--accent);
+  outline: 3px solid rgba(56, 139, 253, 0.18);
 }
 
 .compare-picker {
@@ -1830,10 +1897,15 @@ footer > span {
 }
 
 .compare-picker > button,
+.compare-picker > a,
 .compare-search {
   align-items: center;
   display: inline-flex;
   gap: 7px;
+}
+
+.compare-picker > a {
+  text-decoration: none;
 }
 
 .compare-search {
@@ -2452,7 +2524,8 @@ footer > span {
     overflow-x: auto;
   }
 
-  .ranking-tabs button {
+  .ranking-tabs button,
+  .ranking-tabs a {
     flex: 0 0 auto;
     min-width: 120px;
   }
@@ -2472,6 +2545,19 @@ footer > span {
 
   .compare-shell .page-title h1 {
     font-size: 28px;
+  }
+
+  .compare-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .compare-selects {
+    grid-template-columns: 1fr;
+  }
+
+  .compare-form .primary-button {
+    align-self: flex-start;
   }
 
   .compare-search {

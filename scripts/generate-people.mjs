@@ -16,7 +16,8 @@ const companyAvatars = new Map(
 );
 const baseUrl = process.env.COMMIT_INDEX_API_BASE
   || process.env.OPEN_OFFICE_API_BASE
-  || "https://commitindex.com";
+  || "http://localhost:3000";
+const ingestSecret = process.env.COMMIT_INDEX_INGEST_SECRET || "";
 const incremental = process.env.OPEN_OFFICE_INCREMENTAL === "1";
 const snapshotUrl = new URL("../data/people.json", import.meta.url);
 const failures = [];
@@ -28,7 +29,10 @@ async function load(company) {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const response = await fetch(
-        `${baseUrl}/api/organizations/${encodeURIComponent(company.org)}/contributors`,
+        `${baseUrl}/api/internal/organizations/${encodeURIComponent(company.org)}/contributors`,
+        {
+          headers: ingestSecret ? { Authorization: `Bearer ${ingestSecret}` } : {},
+        },
       );
       if (!response.ok) throw new Error(`${response.status} ${await response.text()}`);
       const payload = await response.json();

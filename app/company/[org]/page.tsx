@@ -1,17 +1,22 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CompanyDetail } from "@/components/company-detail";
-import { getOrganizationActivity, GitHubRequestError } from "@/lib/github";
+import {
+  getStoredContributors,
+  getStoredOrganization,
+  organizationsSnapshot,
+} from "@/lib/snapshots";
 
-export const revalidate = 86400;
+export const dynamicParams = false;
 
-async function loadOrganization(org: string) {
-  try {
-    return await getOrganizationActivity(org);
-  } catch (error) {
-    if (error instanceof GitHubRequestError && (error.status === 400 || error.status === 404)) notFound();
-    throw error;
-  }
+function loadOrganization(org: string) {
+  const organization = getStoredOrganization(org);
+  if (!organization) notFound();
+  return organization;
+}
+
+export function generateStaticParams() {
+  return organizationsSnapshot.entries.map(({ org }) => ({ org }));
 }
 
 export async function generateMetadata({
@@ -35,5 +40,6 @@ export async function generateMetadata({
 export default async function CompanyPage({ params }: { params: Promise<{ org: string }> }) {
   const { org } = await params;
   const data = await loadOrganization(org);
-  return <CompanyDetail data={data} />;
+  const contributors = getStoredContributors(org);
+  return <CompanyDetail contributors={contributors} data={data} />;
 }

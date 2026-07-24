@@ -1,5 +1,3 @@
-"use client";
-
 import type { ActivityDay } from "@/lib/types";
 
 export type Period = "rolling" | "current" | "previous";
