@@ -274,7 +274,7 @@ a {
   align-items: center;
   display: grid;
   gap: 18px;
-  grid-template-columns: 30px minmax(220px, 1fr) minmax(180px, 240px) 104px 18px;
+  grid-template-columns: 30px minmax(220px, 1fr) minmax(210px, 252px) minmax(180px, 240px) 18px;
 }
 
 .directory-list-header {
@@ -285,8 +285,35 @@ a {
   padding: 0 10px;
 }
 
-.directory-list-header span:nth-child(4) {
+.directory-commits-header,
+.directory-commits {
+  align-items: center;
+  display: grid;
+  font-variant-numeric: tabular-nums;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   text-align: right;
+}
+
+.directory-commits-header {
+  position: relative;
+}
+
+.directory-commits-header > span {
+  color: var(--muted);
+  left: 0;
+  position: absolute;
+}
+
+.directory-commits-header small {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.directory-commits {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .directory-row {
@@ -347,9 +374,10 @@ a {
 }
 
 .directory-activity {
-  display: grid;
-  gap: 4px;
-  grid-template-columns: repeat(12, 9px);
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
 }
 
 .directory-activity i {
@@ -377,13 +405,9 @@ a {
 }
 
 .directory-trend {
-  align-items: center;
   color: var(--muted);
-  display: flex;
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-  gap: 7px;
-  justify-content: flex-end;
+  display: block;
+  flex: 0 0 64px;
   min-width: 0;
 }
 
@@ -2244,7 +2268,8 @@ footer > span {
 
   .directory-list-header,
   .directory-row {
-    grid-template-columns: 30px minmax(180px, 1fr) minmax(150px, 200px) 104px 18px;
+    gap: 12px;
+    grid-template-columns: 30px minmax(170px, 1fr) 210px minmax(150px, 200px) 18px;
   }
 
   .company-row {
@@ -2365,21 +2390,24 @@ footer > span {
   .directory-list-header,
   .directory-row {
     gap: 10px;
-    grid-template-columns: 24px minmax(0, 1fr) 84px 18px;
+    grid-template-columns: 24px minmax(0, 1fr) 112px 18px;
   }
 
-  .directory-list-header span:nth-child(3),
+  .directory-list-header > span:nth-child(4),
   .directory-activity {
     display: none;
   }
 
-  .directory-trend {
-    gap: 4px;
+  .directory-commits-header,
+  .directory-commits {
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .directory-trend svg {
-    flex-basis: 54px;
-    width: 54px;
+  .directory-commits-header > span,
+  .directory-commits-header small:nth-of-type(2),
+  .directory-commits > span:nth-child(2) {
+    display: none;
   }
 
   .company-list {

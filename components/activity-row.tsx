@@ -15,6 +15,13 @@ function activityLevel(value: number, max: number) {
   return Math.max(1, Math.min(4, Math.ceil((value / max) * 4)));
 }
 
+function commitsForDays(entry: LeaderboardEntry | undefined, days: number) {
+  if (!entry?.totalCommits) return undefined;
+  return entry.activity
+    .slice(-days)
+    .reduce((sum, day) => sum + day.count, 0);
+}
+
 function ActivityTrend({
   company,
   totalCommits,
@@ -24,7 +31,7 @@ function ActivityTrend({
   totalCommits?: number;
   values: number[];
 }) {
-  if (totalCommits === undefined) {
+  if (!totalCommits) {
     return (
       <span className="directory-trend unavailable" aria-label={`Activity snapshot unavailable for ${company}`}>
         <span aria-hidden="true">—</span>
@@ -54,7 +61,6 @@ function ActivityTrend({
         <polygon points={`2,20 ${points} 62,20`} />
         <polyline points={points} />
       </svg>
-      <span aria-hidden="true">{totalCommits.toLocaleString()}</span>
     </span>
   );
 }
@@ -84,6 +90,17 @@ export function ActivityRow({
         )}
         <strong>{company.name}</strong>
       </span>
+      <span className="directory-commits">
+        <span aria-label={`${company.name} commits in the last 30 days`}>
+          {commitsForDays(entry, 30)?.toLocaleString() ?? "—"}
+        </span>
+        <span aria-label={`${company.name} commits in the last 6 months`}>
+          {commitsForDays(entry, 183)?.toLocaleString() ?? "—"}
+        </span>
+        <span aria-label={`${company.name} commits in the last 12 months`}>
+          {entry?.totalCommits ? entry.totalCommits.toLocaleString() : "—"}
+        </span>
+      </span>
       <span
         className="directory-activity"
         role="img"
@@ -96,8 +113,8 @@ export function ActivityRow({
         {totals.map((total, index) => (
           <i className={`level-${activityLevel(total, max)}`} aria-hidden="true" key={index} />
         ))}
+        <ActivityTrend company={company.name} totalCommits={entry?.totalCommits} values={totals} />
       </span>
-      <ActivityTrend company={company.name} totalCommits={entry?.totalCommits} values={totals} />
       <ArrowRight className="directory-arrow" aria-hidden="true" size={15} />
     </Link>
   );

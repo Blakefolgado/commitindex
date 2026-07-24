@@ -89,8 +89,13 @@ export function Directory({
         <div className="directory-list-header" aria-hidden="true">
           <span>#</span>
           <span>Company</span>
-          <span>12-week activity</span>
-          <span>Trend</span>
+          <span className="directory-commits-header">
+            <span>Commits</span>
+            <small>30d</small>
+            <small>6mo</small>
+            <small>12mo</small>
+          </span>
+          <span>12-week trend</span>
           <span />
         </div>
 
