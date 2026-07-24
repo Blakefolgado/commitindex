@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -14,7 +15,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <Link className="wordmark" href="/" aria-label="Commit Index home">
-        <span className="wordmark-mark" aria-hidden="true" />
+        <Image className="wordmark-mark" src="/icon.svg" alt="" width={24} height={24} priority />
         Commit Index
       </Link>
       <nav className="site-nav" aria-label="Primary navigation">

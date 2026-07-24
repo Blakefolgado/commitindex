@@ -80,24 +80,9 @@ a {
 }
 
 .wordmark-mark {
-  border: 2px solid currentColor;
-  border-radius: 5px;
-  display: inline-block;
-  height: 20px;
-  position: relative;
-  width: 20px;
-}
-
-.wordmark-mark::after {
-  background: var(--background);
-  border: 2px solid currentColor;
-  border-radius: 3px;
-  content: "";
-  height: 8px;
-  position: absolute;
-  right: -4px;
-  top: -4px;
-  width: 8px;
+  display: block;
+  height: 24px;
+  width: 24px;
 }
 
 .site-nav {
