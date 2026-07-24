@@ -1,9 +1,9 @@
-# Open Office
+# Commit Index
 
 Explore public GitHub activity across popular startups and large technology
 companies.
 
-Live at [open-office.vercel.app](https://open-office.vercel.app).
+Live at [commitindex.com](https://commitindex.com).
 
 ## What the grid measures
 

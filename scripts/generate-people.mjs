@@ -14,7 +14,9 @@ const leaderboard = JSON.parse(
 const companyAvatars = new Map(
   leaderboard.entries.map((entry) => [entry.org.toLowerCase(), entry.avatarUrl]),
 );
-const baseUrl = process.env.OPEN_OFFICE_API_BASE || "https://open-office.vercel.app";
+const baseUrl = process.env.COMMIT_INDEX_API_BASE
+  || process.env.OPEN_OFFICE_API_BASE
+  || "https://commitindex.com";
 const incremental = process.env.OPEN_OFFICE_INCREMENTAL === "1";
 const snapshotUrl = new URL("../data/people.json", import.meta.url);
 const failures = [];

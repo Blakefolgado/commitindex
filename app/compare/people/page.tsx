@@ -4,7 +4,7 @@ import { PeopleCompare, type PeopleOption } from "@/components/people-compare";
 import type { PeopleLeaderboardEntry, PeopleLeaderboardSnapshot } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "Compare public GitHub contributors — Open Office",
+  title: "Compare public GitHub contributors — Commit Index",
   description: "Compare individual public contributors across technology company repositories.",
 };
 

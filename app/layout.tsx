@@ -14,12 +14,12 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://open-office.vercel.app"),
-  title: "Open Office — Public company GitHub activity",
+  metadataBase: new URL("https://commitindex.com"),
+  title: "Commit Index — Public company GitHub activity",
   description:
     "Explore public GitHub activity across the world’s most interesting technology companies.",
   openGraph: {
-    title: "Open Office",
+    title: "Commit Index",
     description: "See how the world’s technology companies build in public.",
     type: "website",
   },

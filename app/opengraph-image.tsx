@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Open Office — see how technology companies build in public";
+export const alt = "Commit Index — see how technology companies build in public";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -17,7 +17,7 @@ export default function Image() {
       <div style={{ background: "#0d1117", color: "#f0f6fc", display: "flex", flexDirection: "column", fontFamily: "Arial, sans-serif", height: "100%", padding: "60px 68px", width: "100%" }}>
         <div style={{ alignItems: "center", display: "flex", gap: 16 }}>
           <div style={{ border: "3px solid #f0f6fc", borderRadius: 8, display: "flex", height: 36, width: 36 }} />
-          <span style={{ fontSize: 29, fontWeight: 700 }}>Open Office</span>
+          <span style={{ fontSize: 29, fontWeight: 700 }}>Commit Index</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", marginTop: 68 }}>
           <span style={{ fontSize: 70, fontWeight: 700, letterSpacing: "-3px", lineHeight: 1.02 }}>How companies<br />ship in public.</span>

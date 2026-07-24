@@ -5,7 +5,7 @@ import { companies } from "@/lib/companies";
 import type { LeaderboardSnapshot } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "Compare company GitHub activity — Open Office",
+  title: "Compare company GitHub activity — Commit Index",
   description: "Compare public commits, activity consistency, momentum and shipping patterns across technology companies.",
 };
 

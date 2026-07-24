@@ -3,7 +3,9 @@ import { readFile, writeFile } from "node:fs/promises";
 const source = await readFile(new URL("../lib/companies.ts", import.meta.url), "utf8");
 const companies = [...source.matchAll(/\{ org: "([^"]+)", name: "([^"]+)", category: "([^"]+)", description: "([^"]+)" \}/g)]
   .map((match) => ({ org: match[1], name: match[2], category: match[3], description: match[4] }));
-const baseUrl = process.env.OPEN_OFFICE_API_BASE || "https://open-office.vercel.app";
+const baseUrl = process.env.COMMIT_INDEX_API_BASE
+  || process.env.OPEN_OFFICE_API_BASE
+  || "https://commitindex.com";
 const incremental = process.env.OPEN_OFFICE_INCREMENTAL === "1";
 const snapshotUrl = new URL("../data/leaderboard.json", import.meta.url);
 const failures = [];

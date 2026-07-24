@@ -3,7 +3,7 @@ import leaderboardSnapshot from "@/data/leaderboard.json";
 import type { LeaderboardSnapshot } from "@/lib/types";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://open-office.vercel.app";
+  const base = "https://commitindex.com";
   const indexedCompanies = (leaderboardSnapshot as LeaderboardSnapshot).entries;
 
   return [

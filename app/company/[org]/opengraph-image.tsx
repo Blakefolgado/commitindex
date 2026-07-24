@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { getOrganizationActivity } from "@/lib/github";
 
 export const runtime = "nodejs";
-export const alt = "Company public GitHub activity on Open Office";
+export const alt = "Company public GitHub activity on Commit Index";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -31,7 +31,7 @@ export default async function Image({ params }: { params: Promise<{ org: string 
         <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between" }}>
           <div style={{ alignItems: "center", display: "flex", gap: 16 }}>
             <div style={{ border: "3px solid #f0f6fc", borderRadius: 8, display: "flex", height: 34, width: 34 }} />
-            <span style={{ fontSize: 27, fontWeight: 700 }}>Open Office</span>
+            <span style={{ fontSize: 27, fontWeight: 700 }}>Commit Index</span>
           </div>
           <span style={{ color: "#8b949e", fontSize: 21 }}>Public GitHub activity</span>
         </div>

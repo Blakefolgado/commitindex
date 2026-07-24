@@ -24,7 +24,7 @@ export async function generateMetadata({
   const title = `${data.name} GitHub activity, top shippers and stats`;
   const description = `${data.name} made ${data.totalCommits.toLocaleString()} public commits across ${data.sampledRepos.length} sampled repositories in the last 12 months.`;
   return {
-    title: `${title} — Open Office`,
+    title: `${title} — Commit Index`,
     description,
     alternates: { canonical: `/company/${data.org.toLowerCase()}` },
     openGraph: { title, description, type: "website" },

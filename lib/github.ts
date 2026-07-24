@@ -83,7 +83,7 @@ async function githubFetch<T>(
     headers: {
       Accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": API_VERSION,
-      "User-Agent": "open-office-directory",
+      "User-Agent": "commit-index-directory",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     ...(cacheResult ? { next: { revalidate: 86400 } } : { cache: "no-store" as const }),

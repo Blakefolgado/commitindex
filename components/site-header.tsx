@@ -13,9 +13,9 @@ export function SiteHeader() {
   const pathname = usePathname();
   return (
     <header className="site-header">
-      <Link className="wordmark" href="/" aria-label="Open Office home">
+      <Link className="wordmark" href="/" aria-label="Commit Index home">
         <span className="wordmark-mark" aria-hidden="true" />
-        Open Office
+        Commit Index
       </Link>
       <nav className="site-nav" aria-label="Primary navigation">
         {links.map((link) => {
