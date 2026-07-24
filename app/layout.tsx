@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Newsreader } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
+import { VercelAnalytics } from "@/components/vercel-analytics";
 import "./globals.css";
 
 const geist = Geist({
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className={`${geist.variable} ${newsreader.variable}`}>
         <SiteHeader />
         {children}
+        <VercelAnalytics />
       </body>
     </html>
   );

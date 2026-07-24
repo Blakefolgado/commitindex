@@ -1,25 +1,11 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { Company } from "@/lib/companies";
-import type { LeaderboardEntry } from "@/lib/types";
-
-function weeklyTotals(entry?: LeaderboardEntry) {
-  const days = entry?.activity.slice(-84) ?? [];
-  return Array.from({ length: 12 }, (_, week) =>
-    days.slice(week * 7, week * 7 + 7).reduce((sum, day) => sum + day.count, 0),
-  );
-}
+import type { DirectoryEntry } from "@/lib/types";
 
 function activityLevel(value: number, max: number) {
   if (!value || !max) return 0;
   return Math.max(1, Math.min(4, Math.ceil((value / max) * 4)));
-}
-
-function commitsForDays(entry: LeaderboardEntry | undefined, days: number) {
-  if (!entry?.totalCommits) return undefined;
-  return entry.activity
-    .slice(-days)
-    .reduce((sum, day) => sum + day.count, 0);
 }
 
 function ActivityTrend({
@@ -71,10 +57,10 @@ export function ActivityRow({
   rank,
 }: {
   company: Company;
-  entry?: LeaderboardEntry;
+  entry?: DirectoryEntry;
   rank: number;
 }) {
-  const totals = weeklyTotals(entry);
+  const totals = entry?.weeklyCommits ?? [];
   const max = Math.max(...totals, 0);
 
   return (
@@ -92,20 +78,20 @@ export function ActivityRow({
       </span>
       <span className="directory-commits">
         <span aria-label={`${company.name} commits in the last 30 days`}>
-          {commitsForDays(entry, 30)?.toLocaleString() ?? "—"}
+          {entry?.commits12m ? entry.commits30d.toLocaleString() : "—"}
         </span>
         <span aria-label={`${company.name} commits in the last 6 months`}>
-          {commitsForDays(entry, 183)?.toLocaleString() ?? "—"}
+          {entry?.commits12m ? entry.commits6m.toLocaleString() : "—"}
         </span>
         <span aria-label={`${company.name} commits in the last 12 months`}>
-          {entry?.totalCommits ? entry.totalCommits.toLocaleString() : "—"}
+          {entry?.commits12m ? entry.commits12m.toLocaleString() : "—"}
         </span>
       </span>
       <span
         className="directory-activity"
         role="img"
         aria-label={
-          entry?.totalCommits
+          entry?.commits12m
             ? `${company.name} public activity over the past 12 weeks`
             : `Activity snapshot unavailable for ${company.name}`
         }
@@ -113,7 +99,7 @@ export function ActivityRow({
         {totals.map((total, index) => (
           <i className={`level-${activityLevel(total, max)}`} aria-hidden="true" key={index} />
         ))}
-        <ActivityTrend company={company.name} totalCommits={entry?.totalCommits} values={totals} />
+        <ActivityTrend company={company.name} totalCommits={entry?.commits12m} values={totals} />
       </span>
       <ArrowRight className="directory-arrow" aria-hidden="true" size={15} />
     </Link>

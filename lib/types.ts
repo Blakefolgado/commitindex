@@ -105,6 +105,15 @@ export type LeaderboardSnapshot = {
   entries: LeaderboardEntry[];
 };
 
+export type DirectoryEntry = {
+  org: string;
+  avatarUrl: string;
+  commits30d: number;
+  commits6m: number;
+  commits12m: number;
+  weeklyCommits: number[];
+};
+
 export type PeopleLeaderboardEntry = ContributorSummary & {
   id: string;
   org: string;

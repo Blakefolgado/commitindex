@@ -9,24 +9,24 @@ import {
 } from "react";
 import { ActivityRow } from "@/components/activity-row";
 import { categories, type Company } from "@/lib/companies";
-import type { LeaderboardSnapshot } from "@/lib/types";
+import type { DirectoryEntry } from "@/lib/types";
 
 const requestUrl = "https://github.com/Blakefolgado/open-office/issues/new?template=company-request.yml";
 
 export function Directory({
+  entries,
   initialCompanies,
-  snapshot,
 }: {
+  entries: DirectoryEntry[];
   initialCompanies: Company[];
-  snapshot: LeaderboardSnapshot;
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<(typeof categories)[number]>("All");
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
 
-  const snapshotByOrg = useMemo(
-    () => new Map(snapshot.entries.map((entry) => [entry.org, entry])),
-    [snapshot.entries],
+  const entriesByOrg = useMemo(
+    () => new Map(entries.map((entry) => [entry.org, entry])),
+    [entries],
   );
 
   const companies = useMemo(() => {
@@ -104,7 +104,7 @@ export function Directory({
             {companies.map((company, index) => (
               <ActivityRow
                 company={company}
-                entry={snapshotByOrg.get(company.org)}
+                entry={entriesByOrg.get(company.org)}
                 key={company.org}
                 rank={index + 1}
               />
