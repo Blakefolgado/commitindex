@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
+
 import { Directory } from "@/components/directory";
 import leaderboardSnapshot from "@/data/leaderboard.json";
 import { companies } from "@/lib/companies";
 import type { DirectoryEntry, LeaderboardSnapshot } from "@/lib/types";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const snapshot = leaderboardSnapshot as LeaderboardSnapshot;
 

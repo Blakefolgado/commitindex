@@ -6,6 +6,7 @@ import type { PeopleLeaderboardEntry, PeopleLeaderboardSnapshot } from "@/lib/ty
 export const metadata: Metadata = {
   title: "Compare public GitHub contributors — Commit Index",
   description: "Compare individual public contributors across technology company repositories.",
+  alternates: { canonical: "/compare/people" },
 };
 
 const snapshot = peopleData as PeopleLeaderboardSnapshot;

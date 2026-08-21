@@ -8,6 +8,7 @@ import { peopleSnapshot } from "@/lib/snapshots";
 export const metadata: Metadata = {
   title: "Public GitHub contributor leaderboard — Commit Index",
   description: "Rank public contributors across technology company repositories.",
+  alternates: { canonical: "/leaderboards/people" },
 };
 
 export default async function PeopleLeaderboardsPage({

@@ -15,14 +15,13 @@ const companyAvatars = new Map(
   leaderboard.entries.map((entry) => [entry.org.toLowerCase(), entry.avatarUrl]),
 );
 const baseUrl = process.env.COMMIT_INDEX_API_BASE
-  || process.env.OPEN_OFFICE_API_BASE
   || "http://localhost:3000";
 const ingestSecret = process.env.COMMIT_INDEX_INGEST_SECRET || "";
-const incremental = process.env.OPEN_OFFICE_INCREMENTAL === "1";
+const incremental = process.env.COMMIT_INDEX_INCREMENTAL === "1";
 const snapshotUrl = new URL("../data/people.json", import.meta.url);
 const failures = [];
-const requestedBatchSize = Number.parseInt(process.env.OPEN_OFFICE_BATCH_SIZE || "", 10);
-const requestedWorkers = Number.parseInt(process.env.OPEN_OFFICE_WORKERS || "2", 10);
+const requestedBatchSize = Number.parseInt(process.env.COMMIT_INDEX_BATCH_SIZE || "", 10);
+const requestedWorkers = Number.parseInt(process.env.COMMIT_INDEX_WORKERS || "2", 10);
 const workerCount = Math.max(1, Math.min(Number.isFinite(requestedWorkers) ? requestedWorkers : 2, 4));
 
 async function load(company) {

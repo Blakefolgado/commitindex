@@ -4,14 +4,13 @@ const source = await readFile(new URL("../lib/companies.ts", import.meta.url), "
 const companies = [...source.matchAll(/\{ org: "([^"]+)", name: "([^"]+)", category: "([^"]+)", description: "([^"]+)" \}/g)]
   .map((match) => ({ org: match[1], name: match[2], category: match[3], description: match[4] }));
 const baseUrl = process.env.COMMIT_INDEX_API_BASE
-  || process.env.OPEN_OFFICE_API_BASE
   || "http://localhost:3000";
 const ingestSecret = process.env.COMMIT_INDEX_INGEST_SECRET || "";
-const incremental = process.env.OPEN_OFFICE_INCREMENTAL === "1";
+const incremental = process.env.COMMIT_INDEX_INCREMENTAL === "1";
 const snapshotUrl = new URL("../data/leaderboard.json", import.meta.url);
 const failures = [];
-const requestedBatchSize = Number.parseInt(process.env.OPEN_OFFICE_BATCH_SIZE || "", 10);
-const requestedWorkers = Number.parseInt(process.env.OPEN_OFFICE_WORKERS || "2", 10);
+const requestedBatchSize = Number.parseInt(process.env.COMMIT_INDEX_BATCH_SIZE || "", 10);
+const requestedWorkers = Number.parseInt(process.env.COMMIT_INDEX_WORKERS || "2", 10);
 const workerCount = Math.max(1, Math.min(Number.isFinite(requestedWorkers) ? requestedWorkers : 2, 4));
 
 function calculateStats(activity) {

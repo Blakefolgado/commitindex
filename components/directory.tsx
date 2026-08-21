@@ -11,7 +11,7 @@ import { ActivityRow } from "@/components/activity-row";
 import { categories, type Company } from "@/lib/companies";
 import type { DirectoryEntry } from "@/lib/types";
 
-const requestUrl = "https://github.com/Blakefolgado/open-office/issues/new?template=company-request.yml";
+const requestUrl = "https://github.com/Blakefolgado/commitindex/issues/new?template=company-request.yml";
 
 export function Directory({
   entries,
@@ -123,17 +123,6 @@ export function Directory({
           </div>
         )}
       </section>
-
-      <footer id="about">
-        <details>
-          <summary>Methodology</summary>
-          <p>
-            Public non-merge commits from eight recently active repositories. Private work
-            is excluded; totals are not productivity scores.
-          </p>
-        </details>
-        <span>GitHub · Updated daily</span>
-      </footer>
     </main>
   );
 }

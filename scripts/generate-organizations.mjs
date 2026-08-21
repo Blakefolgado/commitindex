@@ -4,15 +4,13 @@ const leaderboardUrl = new URL("../data/leaderboard.json", import.meta.url);
 const snapshotUrl = new URL("../data/organizations.json", import.meta.url);
 const leaderboard = JSON.parse(await readFile(leaderboardUrl, "utf8"));
 const baseUrl = process.env.COMMIT_INDEX_API_BASE
-  || process.env.OPEN_OFFICE_API_BASE
   || "http://localhost:3000";
 const endpoint = process.env.COMMIT_INDEX_INGEST_PATH
   || "/api/internal/organizations";
 const secret = process.env.COMMIT_INDEX_INGEST_SECRET || "";
-const incremental = process.env.COMMIT_INDEX_INCREMENTAL === "1"
-  || process.env.OPEN_OFFICE_INCREMENTAL === "1";
+const incremental = process.env.COMMIT_INDEX_INCREMENTAL === "1";
 const requestedBatchSize = Number.parseInt(
-  process.env.COMMIT_INDEX_BATCH_SIZE || process.env.OPEN_OFFICE_BATCH_SIZE || "",
+  process.env.COMMIT_INDEX_BATCH_SIZE || "",
   10,
 );
 

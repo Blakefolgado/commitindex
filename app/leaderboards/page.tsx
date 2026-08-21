@@ -6,6 +6,7 @@ import type { LeaderboardSnapshot } from "@/lib/types";
 export const metadata: Metadata = {
   title: "Company and people GitHub leaderboards — Commit Index",
   description: "Rank technology companies and public contributors by commits, code changes, consistency and momentum.",
+  alternates: { canonical: "/leaderboards" },
 };
 
 export default function LeaderboardsPage() {

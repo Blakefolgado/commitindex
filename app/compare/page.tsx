@@ -10,6 +10,7 @@ import type { OrganizationActivity } from "@/lib/types";
 export const metadata: Metadata = {
   title: "Compare company GitHub activity — Commit Index",
   description: "Compare public commits, activity consistency, momentum and shipping patterns across technology companies.",
+  alternates: { canonical: "/compare" },
 };
 
 export default async function ComparePage({

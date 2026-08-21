@@ -73,6 +73,30 @@ export function isValidOrg(org: string) {
   return /^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/.test(org);
 }
 
+const MAX_ATTEMPTS = 4;
+const MAX_THROTTLE_WAIT_MS = 60_000;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Secondary rate limits answer 403 or 429 with retry-after; primary limits answer
+// 403 with a zeroed x-ratelimit-remaining and a reset timestamp.
+function isThrottled(response: Response) {
+  if (response.status === 429) return true;
+  if (response.status !== 403) return false;
+  return response.headers.has("retry-after")
+    || response.headers.get("x-ratelimit-remaining") === "0";
+}
+
+function throttleWaitMs(response: Response, attempt: number) {
+  const retryAfter = Number.parseInt(response.headers.get("retry-after") || "", 10);
+  if (Number.isFinite(retryAfter)) return retryAfter * 1000;
+
+  const reset = Number.parseInt(response.headers.get("x-ratelimit-reset") || "", 10);
+  if (Number.isFinite(reset)) return Math.max(0, reset * 1000 - Date.now());
+
+  return 1000 * 2 ** attempt;
+}
+
 async function githubFetch<T>(
   path: string,
   allowProcessing = false,
@@ -90,10 +114,21 @@ async function githubFetch<T>(
   });
 
   let response = await request();
-  for (let attempt = 1; allowProcessing && response.status === 202 && attempt <= 2; attempt += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 900 * attempt));
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    if (allowProcessing && response.status === 202) {
+      // GitHub computes repository statistics asynchronously and answers 202 until
+      // the cache is warm. A 202 body is empty, so it must never reach response.json().
+      await sleep(900 * attempt);
+    } else if (isThrottled(response)) {
+      const wait = throttleWaitMs(response, attempt);
+      if (wait > MAX_THROTTLE_WAIT_MS) break;
+      await sleep(wait);
+    } else {
+      break;
+    }
     response = await request();
   }
+  if (response.status === 202) throw new GitHubRequestError(202);
   if (!response.ok) throw new GitHubRequestError(response.status);
   return response.json() as Promise<T>;
 }

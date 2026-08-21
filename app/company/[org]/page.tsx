@@ -41,5 +41,37 @@ export default async function CompanyPage({ params }: { params: Promise<{ org: s
   const { org } = await params;
   const data = await loadOrganization(org);
   const contributors = getStoredContributors(org);
-  return <CompanyDetail contributors={contributors} data={data} />;
+  const url = `https://commitindex.com/company/${data.org.toLowerCase()}`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Dataset",
+        name: `${data.name} public GitHub commit activity`,
+        description: `Daily public, non-merge commit counts for ${data.name} across ${data.sampledRepos.length} sampled public repositories over the last 12 months, totalling ${data.totalCommits.toLocaleString()} commits on ${data.activeDays.toLocaleString()} active days.`,
+        url,
+        creator: { "@id": "https://commitindex.com/#organization" },
+        about: { "@type": "Organization", name: data.name, url: `https://github.com/${data.org}` },
+        isAccessibleForFree: true,
+        measurementTechnique: "GitHub repository commit statistics API",
+        dateModified: data.fetchedAt,
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Directory", item: "https://commitindex.com" },
+          { "@type": "ListItem", position: 2, name: data.name, item: url },
+        ],
+      },
+    ],
+  };
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <CompanyDetail contributors={contributors} data={data} />
+    </>
+  );
 }
