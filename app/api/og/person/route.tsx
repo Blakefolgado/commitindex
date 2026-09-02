@@ -158,6 +158,23 @@ function currentStreak(contributions: Array<{ count: number; date: string }>) {
   return streak;
 }
 
+/**
+ * Landmark releases worth naming on a share card. Kept deliberately short and
+ * hand-picked: the full aiReleases list is far too dense to label at 1200px.
+ */
+const milestones = [
+  { date: "2024-05-13", domain: "openai.com", label: "GPT-4o" },
+  { date: "2024-11-24", domain: "cursor.com", label: "Cursor Agent" },
+  { date: "2025-02-24", domain: "anthropic.com", label: "Claude Code" },
+  { date: "2025-08-07", domain: "openai.com", label: "GPT-5" },
+  { date: "2025-11-18", domain: "google.com", label: "Gemini 3" },
+  { date: "2026-02-02", domain: "openai.com", label: "Codex app" },
+];
+
+function logoUrl(domain: string) {
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+}
+
 function personCard(person: {
   avatarUrl: string;
   login: string;
@@ -183,6 +200,16 @@ function personCard(person: {
     ? Math.round(((lastYearTotal - priorYearTotal) / priorYearTotal) * 100)
     : null;
   const [peakX, peakY] = point(months.length - 1, months.at(-1)?.total ?? 0);
+  const monthIndex = (date: string) => months.findIndex((month) => month.start.slice(0, 7) === date.slice(0, 7));
+  // Alternate rows so neighbouring labels cannot overlap at this width.
+  const visibleMilestones = milestones
+    .map((milestone) => ({ ...milestone, index: monthIndex(milestone.date) }))
+    .filter((milestone) => milestone.index >= 0)
+    .map((milestone, row) => ({
+      ...milestone,
+      row: row % 2,
+      x: point(milestone.index, 0)[0],
+    }));
 
   return (
     <div
@@ -237,7 +264,7 @@ function personCard(person: {
         style={{
           display: "flex",
           flexGrow: 1,
-          marginTop: 18,
+          marginTop: 14,
           position: "relative",
           width: "100%",
         }}
@@ -248,6 +275,18 @@ function personCard(person: {
           viewBox={`0 0 ${chart.width} ${chart.height}`}
           width={chart.width}
         >
+          {visibleMilestones.map((milestone) => (
+            <line
+              key={milestone.label}
+              stroke="#8b949e"
+              strokeDasharray="4 6"
+              strokeWidth="2"
+              x1={milestone.x}
+              x2={milestone.x}
+              y1="0"
+              y2={chart.height}
+            />
+          ))}
           <polygon fill="#39d353" fillOpacity="0.16" points={areaPoints} />
           <polyline
             fill="none"
@@ -259,9 +298,27 @@ function personCard(person: {
           />
           <circle cx={peakX} cy={peakY} fill="#39d353" r="9" stroke="#0d1117" strokeWidth="4" />
         </svg>
-        <span style={{ color: "#8b949e", fontSize: 15, left: 2, position: "absolute", top: 0 }}>
-          Contributions per month, last 3 years
-        </span>
+
+        {visibleMilestones.map((milestone) => (
+          <div
+            key={milestone.label}
+            style={{
+              alignItems: "center",
+              background: "#161b22",
+              border: "1px solid #30363d",
+              borderRadius: 999,
+              display: "flex",
+              gap: 7,
+              left: Math.min(Math.max(milestone.x - 60, 0), chart.width - 130),
+              padding: "5px 12px 5px 6px",
+              position: "absolute",
+              top: milestone.row * 40,
+            }}
+          >
+            <img alt="" height={22} src={logoUrl(milestone.domain)} width={22} />
+            <span style={{ color: "#f0f6fc", fontSize: 17 }}>{milestone.label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
