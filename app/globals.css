@@ -3350,8 +3350,8 @@ footer > span {
   margin: 0 0 14px;
 }
 
-.searched-people-table th:nth-child(n + 4),
-.searched-people-table td:nth-child(n + 4) {
+.searched-people-table th:nth-child(n + 5),
+.searched-people-table td:nth-child(n + 5) {
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -3382,4 +3382,44 @@ footer > span {
 
 .searched-people-table .trend-down {
   color: #f85149;
+}
+
+.searched-people-table .searched-people-pick {
+  position: relative;
+  text-align: center;
+  width: 46px;
+  z-index: 1;
+}
+
+.compare-people-chart {
+  display: block;
+  height: auto;
+  margin: 18px 0 0;
+  width: 100%;
+}
+
+.compare-people-axis {
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  padding: 0 12px 18px;
+}
+
+.compare-people-key {
+  border-radius: 3px;
+  display: inline-block;
+  height: 10px;
+  width: 10px;
+}
+
+/* The searched-people table has room for the whole handle. */
+.searched-people-table .leader-person strong {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.searched-people-table th:nth-child(3),
+.searched-people-table td:nth-child(3) {
+  min-width: 210px;
 }

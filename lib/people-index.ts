@@ -1,9 +1,9 @@
-import { head, put } from "@vercel/blob";
+import { list, put } from "@vercel/blob";
 import { renderPersonCard } from "@/lib/person-card";
 import { buildMonthlySeries, type PersonContributionHistory } from "@/lib/types";
 
-const indexPath = "people-index.json";
-const maxEntries = 200;
+const peoplePrefix = "people/";
+const maxEntries = 100;
 
 export type PeopleIndexEntry = {
   avatarUrl: string;
@@ -64,24 +64,29 @@ export function summarizePerson(person: PersonContributionHistory): PeopleIndexE
 export async function readPeopleIndex(): Promise<PeopleIndexEntry[]> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return [];
   try {
-    const blob = await head(indexPath);
-    // 60s is fresh enough for a leaderboard and keeps the two pages on ISR
-    // rather than rendering per request.
-    const response = await fetch(blob.downloadUrl, { next: { revalidate: 60 } });
-    if (!response.ok) return [];
-    return (await response.json()) as PeopleIndexEntry[];
+    const { blobs } = await list({ prefix: peoplePrefix });
+    const recent = blobs
+      .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())
+      .slice(0, maxEntries);
+    const entries = await Promise.all(recent.map(async (blob) => {
+      try {
+        // Short enough that a profile you just searched shows up on the
+        // leaderboard, long enough to keep the page on ISR.
+        const response = await fetch(blob.downloadUrl, { next: { revalidate: 10 } });
+        return response.ok ? (await response.json()) as PeopleIndexEntry : null;
+      } catch {
+        return null;
+      }
+    }));
+    return entries
+      .filter((entry): entry is PeopleIndexEntry => Boolean(entry?.login))
+      .sort((a, b) => b.contributions12m - a.contributions12m);
   } catch {
-    // No index yet, or the store is unreachable — the leaderboard just stays empty.
+    // No index yet, or the store is unreachable — the leaderboard stays empty.
     return [];
   }
 }
 
-/**
- * Upsert one person into the shared index.
- * ponytail: read-modify-write on a single blob, so two lookups landing in the
- * same instant can drop one of them. Move to per-login blobs plus an aggregation
- * pass if lookups ever become concurrent enough for that to matter.
- */
 /**
  * Renders the share card once, at search time, and stores it as a plain PNG.
  * Crawlers then fetch a static file from the CDN instead of waiting on a
@@ -99,21 +104,24 @@ async function storeCard(entry: PeopleIndexEntry) {
   return blob.url;
 }
 
+/**
+ * Save one person as their own blob. One file per login means two lookups
+ * landing at the same moment cannot overwrite each other, which a single
+ * read-modify-write index could and did.
+ * ponytail: the leaderboard read fetches every stored person, capped at the 100
+ * most recent. Aggregate into one file on write if that list ever gets long.
+ */
 export async function recordPerson(person: PersonContributionHistory) {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return;
   const entry = summarizePerson(person);
   // A card that fails to render must not cost us the index entry.
   entry.cardUrl = await storeCard(entry).catch(() => undefined);
-  const existing = await readPeopleIndex();
-  const entries = [entry, ...existing.filter((candidate) => candidate.login !== entry.login)]
-    .sort((a, b) => b.contributions12m - a.contributions12m)
-    .slice(0, maxEntries);
 
-  await put(indexPath, JSON.stringify(entries), {
+  await put(`${peoplePrefix}${entry.login.toLowerCase()}.json`, JSON.stringify(entry), {
     access: "public",
     addRandomSuffix: false,
     allowOverwrite: true,
-    cacheControlMaxAge: 60,
+    cacheControlMaxAge: 10,
     contentType: "application/json",
   });
 }

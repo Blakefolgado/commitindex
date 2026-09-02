@@ -5,7 +5,7 @@ import { PeopleExplorer } from "@/components/people-explorer";
 import { SearchedPeople } from "@/components/searched-people";
 import { readPeopleIndex } from "@/lib/people-index";
 
-export const revalidate = 60;
+export const revalidate = 10;
 
 export async function generateMetadata({
   searchParams,
@@ -24,7 +24,7 @@ export async function generateMetadata({
   const image = saved?.cardUrl
     ?? (user ? `/api/og/person?user=${encodeURIComponent(user)}&v=3` : "/api/og/person?v=3");
   const title = user
-    ? `@${user}'s GitHub momentum through the AI era — Commit Index`
+    ? `How much is @${user} shipping? — Commit Index`
     : "All-time GitHub contribution graph with AI release dates — Commit Index";
   const description = user
     ? `See how @${user}'s public GitHub contributions changed as major AI models and coding tools shipped.`

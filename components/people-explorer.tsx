@@ -642,7 +642,7 @@ export function PeopleExplorer({
   return (
     <main className="people-shell">
       <header className="people-intro">
-        <h1>GitHub momentum</h1>
+        <h1>How much shipping?</h1>
       </header>
 
       <form className="people-search" onSubmit={submit}>

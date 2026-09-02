@@ -88,10 +88,10 @@ function genericCard() {
 
       <div style={{ display: "flex", flexDirection: "column", marginTop: 38, width: 735 }}>
         <span style={{ fontSize: 57, fontWeight: 700, letterSpacing: "-2.7px", lineHeight: 1.02 }}>
-          Your GitHub momentum,
+          How much shipping?
         </span>
         <span style={{ color: "#8b949e", fontSize: 57, fontWeight: 700, letterSpacing: "-2.7px", lineHeight: 1.02 }}>
-          mapped against the AI era.
+          Your commits against the AI era.
         </span>
       </div>
 

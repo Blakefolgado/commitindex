@@ -47,15 +47,17 @@ export async function SearchedPeople({ limit = 25 }: { limit?: number }) {
   return (
     <div className="searched-people-shell">
       <h2>Recently searched</h2>
+      <form action="/people/compare" method="get">
       <section className="leaderboard-panel searched-people">
       <div className="people-table-actions">
         <span>Most recently searched profiles, ranked by the last 12 months</span>
-        <Link className="primary-button" href="/people">Search a profile</Link>
+        <button className="primary-button" type="submit">Compare selected</button>
       </div>
       <div className="leaderboard-table-wrap">
         <table className="leaderboard-table searched-people-table">
           <thead>
             <tr>
+              <th><span className="sr-only">Compare</span></th>
               <th>Rank</th>
               <th>Person</th>
               <th>3 year trend</th>
@@ -70,6 +72,14 @@ export async function SearchedPeople({ limit = 25 }: { limit?: number }) {
               const change = acceleration(person.contributions12m, person.contributionsPrior12m);
               return (
                 <tr key={person.login}>
+                  <td className="searched-people-pick">
+                    <input
+                      aria-label={`Compare ${person.login}`}
+                      name="users"
+                      type="checkbox"
+                      value={person.login}
+                    />
+                  </td>
                   <td>{index + 1}</td>
                   <td>
                     <Link className="leader-person" href={`/people?user=${person.login}`}>
@@ -94,6 +104,7 @@ export async function SearchedPeople({ limit = 25 }: { limit?: number }) {
         </table>
       </div>
       </section>
+      </form>
     </div>
   );
 }
