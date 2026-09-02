@@ -3,6 +3,29 @@ export type ActivityDay = {
   count: number;
 };
 
+export type PersonContributionDay = ActivityDay & {
+  level: number;
+};
+
+export type PersonContributionYear = {
+  login: string;
+  name: string;
+  avatarUrl: string;
+  githubUrl: string;
+  year: number;
+  totalContributions: number;
+  activeDays: number;
+  averageActiveDay: number;
+  contributions: PersonContributionDay[];
+  fetchedAt: string;
+};
+
+export type PersonContributionHistory = Omit<PersonContributionYear, "year"> & {
+  createdAt: string;
+  firstYear: number;
+  lastYear: number;
+};
+
 export type CodeFrequencyWeek = {
   week: number;
   additions: number;
@@ -127,3 +150,23 @@ export type PeopleLeaderboardSnapshot = {
   source: string;
   entries: PeopleLeaderboardEntry[];
 };
+
+// Shared by the on-page momentum chart and the /api/og/person share image so
+// both render the same window: whole months only, last five years.
+export function buildMonthlySeries(contributions: PersonContributionDay[]) {
+  const months = new Map<string, number>();
+  contributions.forEach((day) => {
+    const month = day.date.slice(0, 7);
+    months.set(month, (months.get(month) ?? 0) + day.count);
+  });
+  const series = [...months].map(([month, total]) => ({
+    start: `${month}-01`,
+    total,
+  }));
+  // The in-progress month is a partial count and reads as a cliff; drop it.
+  const currentMonth = `${new Date().toISOString().slice(0, 7)}-01`;
+  const complete = series.length > 1 && series.at(-1)!.start === currentMonth
+    ? series.slice(0, -1)
+    : series;
+  return complete.slice(-60);
+}
