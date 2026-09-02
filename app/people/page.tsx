@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PeopleExplorer } from "@/components/people-explorer";
+import { SearchedPeople } from "@/components/searched-people";
+
+export const revalidate = 60;
 
 export async function generateMetadata({
   searchParams,
@@ -52,8 +55,9 @@ export default async function PeoplePage({
   }
 
   return (
-    <PeopleExplorer
-      initialUsername={params.user?.trim() || ""}
-    />
+    <>
+      <PeopleExplorer initialUsername={params.user?.trim() || ""} />
+      <SearchedPeople />
+    </>
   );
 }

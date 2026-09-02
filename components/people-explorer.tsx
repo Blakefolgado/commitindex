@@ -670,7 +670,7 @@ export function PeopleExplorer({
             />
           </section>
 
-          <details className="people-release-list">
+          <details className="people-release-list" open>
             <summary>
               <strong>AI release index</strong>
               <span>{releases.length} releases</span>

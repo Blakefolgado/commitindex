@@ -3339,3 +3339,21 @@ footer > span {
     animation-iteration-count: 1 !important;
   }
 }
+
+.searched-people {
+  margin-top: 28px;
+}
+
+.searched-people-table th:nth-child(n + 3),
+.searched-people-table td:nth-child(n + 3) {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.searched-people-table .trend-up {
+  color: #3fb950;
+}
+
+.searched-people-table .trend-down {
+  color: #f85149;
+}

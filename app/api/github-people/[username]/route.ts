@@ -3,6 +3,7 @@ import {
   getPersonContributionHistory,
   GitHubPersonError,
 } from "@/lib/github-person";
+import { recordPerson } from "@/lib/people-index";
 
 export const runtime = "nodejs";
 
@@ -13,7 +14,11 @@ export async function GET(
   const { username } = await context.params;
 
   try {
-    return NextResponse.json(await getPersonContributionHistory(username), {
+    const person = await getPersonContributionHistory(username);
+    // Indexing is a side effect of someone looking a profile up; never let a
+    // storage hiccup turn a successful lookup into an error page.
+    await recordPerson(person).catch(() => {});
+    return NextResponse.json(person, {
       headers: {
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
       },

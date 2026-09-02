@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 
 import { Directory } from "@/components/directory";
+import { SearchedPeople } from "@/components/searched-people";
 import leaderboardSnapshot from "@/data/leaderboard.json";
 import { companies } from "@/lib/companies";
 import type { DirectoryEntry, LeaderboardSnapshot } from "@/lib/types";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -35,9 +38,12 @@ const indexedOrgs = new Set(directoryEntries.map((entry) => entry.org));
 
 export default function Home() {
   return (
-    <Directory
-      entries={directoryEntries}
-      initialCompanies={companies.filter((company) => indexedOrgs.has(company.org))}
-    />
+    <>
+      <Directory
+        entries={directoryEntries}
+        initialCompanies={companies.filter((company) => indexedOrgs.has(company.org))}
+      />
+      <SearchedPeople limit={10} />
+    </>
   );
 }
