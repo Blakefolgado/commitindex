@@ -138,13 +138,13 @@ export function parseContributionCalendar(html: string) {
   return { contributions, totalContributions };
 }
 
-async function getGitHubProfilePage(username: string) {
+async function getGitHubProfilePage(username: string, fresh = false) {
   const response = await fetch(`https://github.com/${encodeURIComponent(username)}`, {
     headers: {
       Accept: "text/html",
       "User-Agent": "Mozilla/5.0 (compatible; CommitIndex/1.0; +https://commitindex.com)",
     },
-    next: { revalidate: 86_400 },
+    ...cacheFor(86_400, fresh),
   });
   if (!response.ok) {
     throw new GitHubPersonError(response.status, response.status === 404
@@ -154,10 +154,17 @@ async function getGitHubProfilePage(username: string) {
   return parseGitHubProfileHtml(await response.text(), username);
 }
 
-async function getGitHubProfile(username: string) {
+/** Skips every layer of caching, for a profile whose GitHub settings just changed. */
+type FetchCache = { next: { revalidate: number } } | { cache: "no-store" };
+
+function cacheFor(seconds: number, fresh: boolean): FetchCache {
+  return fresh ? { cache: "no-store" } : { next: { revalidate: seconds } };
+}
+
+async function getGitHubProfile(username: string, fresh = false) {
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
-    return getGitHubProfilePage(username);
+    return getGitHubProfilePage(username, fresh);
   }
 
   const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
@@ -167,7 +174,7 @@ async function getGitHubProfile(username: string) {
       "User-Agent": "commit-index-people",
       Authorization: `Bearer ${token}`,
     },
-    next: { revalidate: 86_400 },
+    ...cacheFor(86_400, fresh),
   });
   if (response.ok) {
     return response.json() as Promise<GitHubProfile>;
@@ -175,10 +182,10 @@ async function getGitHubProfile(username: string) {
   if (response.status === 404) {
     throw new GitHubPersonError(404, "GitHub user not found");
   }
-  return getGitHubProfilePage(username);
+  return getGitHubProfilePage(username, fresh);
 }
 
-async function getContributionCalendar(username: string, year: number) {
+async function getContributionCalendar(username: string, year: number, fresh = false) {
   const response = await fetch(
     `https://github.com/users/${encodeURIComponent(username)}/contributions?from=${year}-01-01&to=${year}-12-31`,
     {
@@ -186,7 +193,7 @@ async function getContributionCalendar(username: string, year: number) {
         Accept: "text/html",
         "User-Agent": "commit-index-people",
       },
-      next: { revalidate: year === new Date().getUTCFullYear() ? 3_600 : 2_592_000 },
+      ...cacheFor(year === new Date().getUTCFullYear() ? 3_600 : 2_592_000, fresh),
     },
   );
   if (!response.ok) {
@@ -248,9 +255,10 @@ async function mapWithConcurrency<T, R>(
 
 export async function getPersonContributionHistory(
   rawUsername: string,
+  fresh = false,
 ): Promise<PersonContributionHistory> {
   const username = normalizeGitHubUsername(rawUsername);
-  const profile = await getGitHubProfile(username);
+  const profile = await getGitHubProfile(username, fresh);
   const currentYear = new Date().getUTCFullYear();
   const firstYear = Math.max(
     FIRST_GITHUB_YEAR,
@@ -263,7 +271,7 @@ export async function getPersonContributionHistory(
   const calendars = await mapWithConcurrency(
     years,
     4,
-    (year) => getContributionCalendar(username, year),
+    (year) => getContributionCalendar(username, year, fresh),
   );
   const firstActiveCalendar = calendars.findIndex((calendar) => calendar.totalContributions > 0);
   const firstVisibleCalendar = firstActiveCalendar >= 0 ? firstActiveCalendar : calendars.length - 1;

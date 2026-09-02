@@ -8,19 +8,24 @@ import { recordPerson } from "@/lib/people-index";
 export const runtime = "nodejs";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ username: string }> },
 ) {
   const { username } = await context.params;
+  // ?refresh=1 bypasses every cache, for a profile whose GitHub contribution
+  // settings changed and whose stored history is now wrong.
+  const fresh = request.nextUrl.searchParams.get("refresh") === "1";
 
   try {
-    const person = await getPersonContributionHistory(username);
+    const person = await getPersonContributionHistory(username, fresh);
     // Indexing is a side effect of someone looking a profile up; never let a
     // storage hiccup turn a successful lookup into an error page.
     await recordPerson(person).catch(() => {});
     return NextResponse.json(person, {
       headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        "Cache-Control": fresh
+          ? "no-store"
+          : "public, s-maxage=3600, stale-while-revalidate=86400",
       },
     });
   } catch (error) {
