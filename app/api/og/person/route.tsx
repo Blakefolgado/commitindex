@@ -139,11 +139,23 @@ function genericCard() {
 
 function metric(label: string, value: string) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <span style={{ color: "#8b949e", fontSize: 17 }}>{label}</span>
-      <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-1px" }}>{value}</span>
+    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <span style={{ color: "#8b949e", fontSize: 19 }}>{label}</span>
+      <span style={{ color: "#39d353", fontSize: 52, fontWeight: 700, letterSpacing: "-1.6px" }}>
+        {value}
+      </span>
     </div>
   );
+}
+
+/** Consecutive active days ending at the most recent day, ignoring a still-empty today. */
+function currentStreak(contributions: Array<{ count: number; date: string }>) {
+  let streak = 0;
+  for (let index = contributions.length - 1; index >= 0; index -= 1) {
+    if (contributions[index].count > 0) streak += 1;
+    else if (index < contributions.length - 1) break;
+  }
+  return streak;
 }
 
 function personCard(person: {
@@ -151,24 +163,26 @@ function personCard(person: {
   login: string;
   months: Array<{ start: string; total: number }>;
   name: string;
+  streak: number;
 }) {
   const { months } = person;
-  const chart = { width: 1040, height: 168 };
+  const chart = { width: 1096, height: 196, inset: 10 };
   const maximum = Math.max(...months.map((month) => month.total), 1);
-  const points = months
-    .map((month, index) => {
-      const x = (index / Math.max(months.length - 1, 1)) * chart.width;
-      const y = chart.height - (month.total / maximum) * chart.height;
-      return `${Math.round(x)},${Math.round(y)}`;
-    })
-    .join(" ");
+  const point = (index: number, total: number) => [
+    Math.round(
+      chart.inset
+      + (index / Math.max(months.length - 1, 1)) * (chart.width - chart.inset * 2),
+    ),
+    Math.round(chart.inset + (1 - total / maximum) * (chart.height - chart.inset * 2)),
+  ];
+  const points = months.map((month, index) => point(index, month.total).join(",")).join(" ");
+  const areaPoints = `${chart.inset},${chart.height} ${points} ${chart.width - chart.inset},${chart.height}`;
   const lastYearTotal = months.slice(-12).reduce((sum, month) => sum + month.total, 0);
   const priorYearTotal = months.slice(-24, -12).reduce((sum, month) => sum + month.total, 0);
   const change = priorYearTotal
     ? Math.round(((lastYearTotal - priorYearTotal) / priorYearTotal) * 100)
     : null;
-  const firstLabel = months[0]?.start.slice(0, 4) ?? "";
-  const lastLabel = months.at(-1)?.start.slice(0, 4) ?? "";
+  const [peakX, peakY] = point(months.length - 1, months.at(-1)?.total ?? 0);
 
   return (
     <div
@@ -179,7 +193,7 @@ function personCard(person: {
         flexDirection: "column",
         fontFamily: "Arial, sans-serif",
         height: "100%",
-        padding: "44px 58px",
+        padding: "40px 52px 32px",
         width: "100%",
       }}
     >
@@ -188,63 +202,66 @@ function personCard(person: {
         <span style={{ color: "#8b949e", fontSize: 19 }}>commitindex.com/people</span>
       </div>
 
-      <div style={{ alignItems: "center", display: "flex", gap: 28, marginTop: 30 }}>
+      <div style={{ alignItems: "center", display: "flex", gap: 26, marginTop: 26 }}>
         <img
           alt=""
-          height={148}
+          height={132}
           src={person.avatarUrl}
-          style={{ borderRadius: 74, height: 148, objectFit: "cover", width: 148 }}
-          width={148}
+          style={{
+            border: "3px solid #39d353",
+            borderRadius: 66,
+            height: 132,
+            objectFit: "cover",
+            width: 132,
+          }}
+          width={132}
         />
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <span style={{ fontSize: 52, fontWeight: 700, letterSpacing: "-2px", lineHeight: 1.05 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <span style={{ fontSize: 50, fontWeight: 700, letterSpacing: "-1.9px", lineHeight: 1.05 }}>
             {person.name}
           </span>
-          <span style={{ color: "#8b949e", fontSize: 28 }}>@{person.login}</span>
+          <span style={{ color: "#8b949e", fontSize: 27 }}>@{person.login}</span>
         </div>
-        <div style={{ display: "flex", gap: 44, marginLeft: "auto" }}>
-          {metric("Last 12 months", lastYearTotal.toLocaleString())}
-          {change === null
-            ? metric("Contributions", months.reduce((sum, month) => sum + month.total, 0).toLocaleString())
-            : metric("Year on year", `${change >= 0 ? "+" : ""}${change}%`)}
-        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 64, marginTop: 22 }}>
+        {metric("Last 12 months", lastYearTotal.toLocaleString())}
+        {metric(
+          "Year on year",
+          change === null ? "—" : `${change >= 0 ? "+" : ""}${change}%`,
+        )}
+        {metric("Current streak", `${person.streak}d`)}
       </div>
 
       <div
         style={{
-          background: "#0f141b",
-          border: "1px solid #21262d",
-          borderRadius: 12,
           display: "flex",
-          height: 244,
-          marginTop: 26,
-          overflow: "hidden",
+          flexGrow: 1,
+          marginTop: 18,
           position: "relative",
           width: "100%",
         }}
       >
-        <span style={{ color: "#8b949e", fontSize: 15, left: 22, position: "absolute", top: 16 }}>
-          Contributions per month, last 3 years
-        </span>
         <svg
           height={chart.height}
-          style={{ bottom: 30, left: 20, position: "absolute" }}
+          style={{ bottom: 0, left: 0, position: "absolute" }}
           viewBox={`0 0 ${chart.width} ${chart.height}`}
           width={chart.width}
         >
+          <polygon fill="#39d353" fillOpacity="0.16" points={areaPoints} />
           <polyline
             fill="none"
             points={points}
-            stroke="#58a6ff"
+            stroke="#39d353"
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth="4"
+            strokeWidth="5"
           />
+          <circle cx={peakX} cy={peakY} fill="#39d353" r="9" stroke="#0d1117" strokeWidth="4" />
         </svg>
-        <div style={{ bottom: 8, display: "flex", justifyContent: "space-between", left: 20, position: "absolute", width: chart.width }}>
-          <span style={{ color: "#8b949e", fontSize: 13 }}>{firstLabel}</span>
-          <span style={{ color: "#8b949e", fontSize: 13 }}>{lastLabel}</span>
-        </div>
+        <span style={{ color: "#8b949e", fontSize: 15, left: 2, position: "absolute", top: 0 }}>
+          Contributions per month, last 3 years
+        </span>
       </div>
     </div>
   );
@@ -266,6 +283,7 @@ export async function GET(request: NextRequest) {
         login: person.login,
         months,
         name: person.name,
+        streak: currentStreak(person.contributions),
       }),
       { ...size, headers: cacheHeaders },
     );
