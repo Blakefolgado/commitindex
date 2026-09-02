@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUpRight, ChevronDown, LoaderCircle, Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FormEvent,
   useEffect,
@@ -574,6 +574,10 @@ export function PeopleExplorer({
   initialUsername: string;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // The URL is the source of truth: a client-side navigation (a leaderboard row,
+  // the back button) changes the param without remounting this component.
+  const urlUsername = searchParams.get("user")?.trim().replace(/^@/, "") ?? initialUsername;
   const [input, setInput] = useState(initialUsername ? `github.com/${initialUsername}` : "");
   const [username, setUsername] = useState(initialUsername);
   const [data, setData] = useState<PersonContributionHistory | null>(null);
@@ -581,6 +585,15 @@ export function PeopleExplorer({
   const [loading, setLoading] = useState(Boolean(initialUsername));
   const [requestKey, setRequestKey] = useState(0);
   const releases = aiReleases;
+
+  useEffect(() => {
+    if (urlUsername === username) return;
+    setUsername(urlUsername);
+    setInput(urlUsername ? `github.com/${urlUsername}` : "");
+    setError("");
+    setLoading(Boolean(urlUsername));
+    if (!urlUsername) setData(null);
+  }, [urlUsername, username]);
 
   useEffect(() => {
     if (!username) return;
@@ -618,7 +631,8 @@ export function PeopleExplorer({
     setUsername(nextUsername);
     setInput(`github.com/${nextUsername}`);
     setRequestKey((value) => value + 1);
-    router.replace(`/people?user=${encodeURIComponent(nextUsername)}`, { scroll: false });
+    // push, not replace, so the back button returns to whatever came before.
+    router.push(`/people?user=${encodeURIComponent(nextUsername)}`, { scroll: false });
   }
 
   return (

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { PeopleExplorer } from "@/components/people-explorer";
 import { SearchedPeople } from "@/components/searched-people";
@@ -56,7 +57,9 @@ export default async function PeoplePage({
 
   return (
     <>
-      <PeopleExplorer initialUsername={params.user?.trim() || ""} />
+      <Suspense fallback={null}>
+        <PeopleExplorer initialUsername={params.user?.trim() || ""} />
+      </Suspense>
       <SearchedPeople />
     </>
   );
