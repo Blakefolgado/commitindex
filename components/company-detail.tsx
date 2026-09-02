@@ -104,7 +104,7 @@ export function CompanyDetail({
           {topContributors.length ? (
             <div className="contributors-table">
               {topContributors.map((person, index) => (
-                <a href={person.githubUrl} target="_blank" rel="noreferrer" className="contributor-row" key={person.login}>
+                <Link className="contributor-row" href={`/people?user=${person.login}`} key={person.login}>
                   <span className="rank">{index + 1}</span>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={person.avatarUrl} alt="" width={28} height={28} />
@@ -112,7 +112,7 @@ export function CompanyDetail({
                   <span>{person.repositories} repos</span>
                   <span>{person.commits.toLocaleString()}</span>
                   <i><b style={{ width: `${(person.commits / maxContributorCommits) * 100}%` }} /></i>
-                </a>
+                </Link>
               ))}
             </div>
           ) : (

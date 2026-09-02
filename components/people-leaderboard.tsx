@@ -190,11 +190,11 @@ export function PeopleLeaderboard({
                   <tr key={person.id}>
                     <td>{index + 1}</td>
                     <td>
-                      <a className="leader-person" href={person.githubUrl} target="_blank" rel="noreferrer">
+                      <Link className="leader-person" href={`/people?user=${person.login}`}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={person.avatarUrl} alt="" width={30} height={30} />
                         <strong>@{person.login}</strong>
-                      </a>
+                      </Link>
                     </td>
                     <td>
                       <Link className="person-company" href={`/company/${person.org}`}>
