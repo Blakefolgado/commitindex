@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { PeopleExplorer } from "@/components/people-explorer";
 import { SearchedPeople } from "@/components/searched-people";
+import { readPeopleIndex } from "@/lib/people-index";
 
 export const revalidate = 60;
 
@@ -14,9 +15,14 @@ export async function generateMetadata({
   const user = (await searchParams).user?.trim().replace(/^@/, "") ?? "";
   // File-convention opengraph-image.tsx would win over this, so the route
   // handler is the single generator for both the generic and per-person cards.
-  // ?v is bumped by hand when the card design changes: crawlers cache the
-  // image per URL, so a new design needs a new address to be picked up.
-  const image = user ? `/api/og/person?user=${encodeURIComponent(user)}&v=3` : "/api/og/person?v=3";
+  // Prefer the PNG stored when this profile was searched: a static CDN file
+  // beats making a crawler wait while the card is drawn. ?v is bumped by hand
+  // when the design changes, since crawlers cache the image per URL.
+  const saved = user
+    ? (await readPeopleIndex()).find((entry) => entry.login.toLowerCase() === user.toLowerCase())
+    : undefined;
+  const image = saved?.cardUrl
+    ?? (user ? `/api/og/person?user=${encodeURIComponent(user)}&v=3` : "/api/og/person?v=3");
   const title = user
     ? `@${user}'s GitHub momentum through the AI era — Commit Index`
     : "All-time GitHub contribution graph with AI release dates — Commit Index";

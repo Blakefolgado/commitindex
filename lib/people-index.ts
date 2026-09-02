@@ -1,4 +1,5 @@
 import { head, put } from "@vercel/blob";
+import { renderPersonCard } from "@/lib/person-card";
 import { buildMonthlySeries, type PersonContributionHistory } from "@/lib/types";
 
 const indexPath = "people-index.json";
@@ -9,6 +10,8 @@ export type PeopleIndexEntry = {
   contributions30d: number;
   contributions12m: number;
   contributionsPrior12m: number;
+  /** Public URL of this person's pre-rendered share card, if it saved. */
+  cardUrl?: string;
   login: string;
   lookedUpAt: string;
   /** Monthly contribution totals over the same 3-year window as the chart. */
@@ -79,9 +82,28 @@ export async function readPeopleIndex(): Promise<PeopleIndexEntry[]> {
  * same instant can drop one of them. Move to per-login blobs plus an aggregation
  * pass if lookups ever become concurrent enough for that to matter.
  */
+/**
+ * Renders the share card once, at search time, and stores it as a plain PNG.
+ * Crawlers then fetch a static file from the CDN instead of waiting on a
+ * function that has to draw the image while they hold the connection open.
+ */
+async function storeCard(entry: PeopleIndexEntry) {
+  const body = await renderPersonCard(entry);
+  const blob = await put(`cards/${entry.login.toLowerCase()}.png`, Buffer.from(body), {
+    access: "public",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    cacheControlMaxAge: 3600,
+    contentType: "image/png",
+  });
+  return blob.url;
+}
+
 export async function recordPerson(person: PersonContributionHistory) {
   if (!process.env.BLOB_READ_WRITE_TOKEN) return;
   const entry = summarizePerson(person);
+  // A card that fails to render must not cost us the index entry.
+  entry.cardUrl = await storeCard(entry).catch(() => undefined);
   const existing = await readPeopleIndex();
   const entries = [entry, ...existing.filter((candidate) => candidate.login !== entry.login)]
     .sort((a, b) => b.contributions12m - a.contributions12m)
