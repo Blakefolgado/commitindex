@@ -138,13 +138,13 @@ export function parseContributionCalendar(html: string) {
   return { contributions, totalContributions };
 }
 
-async function getGitHubProfilePage(username: string, fresh = false) {
+async function getGitHubProfilePage(username: string) {
   const response = await fetch(`https://github.com/${encodeURIComponent(username)}`, {
     headers: {
       Accept: "text/html",
       "User-Agent": "Mozilla/5.0 (compatible; CommitIndex/1.0; +https://commitindex.com)",
     },
-    ...cacheFor(86_400, fresh),
+    ...cacheFor(86_400, username),
   });
   if (!response.ok) {
     throw new GitHubPersonError(response.status, response.status === 404
@@ -154,17 +154,19 @@ async function getGitHubProfilePage(username: string, fresh = false) {
   return parseGitHubProfileHtml(await response.text(), username);
 }
 
-/** Skips every layer of caching, for a profile whose GitHub settings just changed. */
-type FetchCache = { next: { revalidate: number } } | { cache: "no-store" };
-
-function cacheFor(seconds: number, fresh: boolean): FetchCache {
-  return fresh ? { cache: "no-store" } : { next: { revalidate: seconds } };
+/** Cache tag for everything fetched about one person, so a refresh can drop it. */
+export function personCacheTag(username: string) {
+  return `github-person:${username.toLowerCase()}`;
 }
 
-async function getGitHubProfile(username: string, fresh = false) {
+function cacheFor(seconds: number, username: string) {
+  return { next: { revalidate: seconds, tags: [personCacheTag(username)] } };
+}
+
+async function getGitHubProfile(username: string) {
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
-    return getGitHubProfilePage(username, fresh);
+    return getGitHubProfilePage(username);
   }
 
   const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
@@ -174,7 +176,7 @@ async function getGitHubProfile(username: string, fresh = false) {
       "User-Agent": "commit-index-people",
       Authorization: `Bearer ${token}`,
     },
-    ...cacheFor(86_400, fresh),
+    ...cacheFor(86_400, username),
   });
   if (response.ok) {
     return response.json() as Promise<GitHubProfile>;
@@ -182,10 +184,10 @@ async function getGitHubProfile(username: string, fresh = false) {
   if (response.status === 404) {
     throw new GitHubPersonError(404, "GitHub user not found");
   }
-  return getGitHubProfilePage(username, fresh);
+  return getGitHubProfilePage(username);
 }
 
-async function getContributionCalendar(username: string, year: number, fresh = false) {
+async function getContributionCalendar(username: string, year: number) {
   const response = await fetch(
     `https://github.com/users/${encodeURIComponent(username)}/contributions?from=${year}-01-01&to=${year}-12-31`,
     {
@@ -193,7 +195,7 @@ async function getContributionCalendar(username: string, year: number, fresh = f
         Accept: "text/html",
         "User-Agent": "commit-index-people",
       },
-      ...cacheFor(year === new Date().getUTCFullYear() ? 3_600 : 2_592_000, fresh),
+      ...cacheFor(year === new Date().getUTCFullYear() ? 3_600 : 2_592_000, username),
     },
   );
   if (!response.ok) {
@@ -255,10 +257,9 @@ async function mapWithConcurrency<T, R>(
 
 export async function getPersonContributionHistory(
   rawUsername: string,
-  fresh = false,
 ): Promise<PersonContributionHistory> {
   const username = normalizeGitHubUsername(rawUsername);
-  const profile = await getGitHubProfile(username, fresh);
+  const profile = await getGitHubProfile(username);
   const currentYear = new Date().getUTCFullYear();
   const firstYear = Math.max(
     FIRST_GITHUB_YEAR,
@@ -271,7 +272,7 @@ export async function getPersonContributionHistory(
   const calendars = await mapWithConcurrency(
     years,
     4,
-    (year) => getContributionCalendar(username, year, fresh),
+    (year) => getContributionCalendar(username, year),
   );
   const firstActiveCalendar = calendars.findIndex((calendar) => calendar.totalContributions > 0);
   const firstVisibleCalendar = firstActiveCalendar >= 0 ? firstActiveCalendar : calendars.length - 1;
