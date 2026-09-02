@@ -1,5 +1,5 @@
 import { head, put } from "@vercel/blob";
-import type { PersonContributionHistory } from "@/lib/types";
+import { buildMonthlySeries, type PersonContributionHistory } from "@/lib/types";
 
 const indexPath = "people-index.json";
 const maxEntries = 200;
@@ -11,6 +11,8 @@ export type PeopleIndexEntry = {
   contributionsPrior12m: number;
   login: string;
   lookedUpAt: string;
+  /** Monthly contribution totals over the same 3-year window as the chart. */
+  months: number[];
   name: string;
   streak: number;
 };
@@ -50,6 +52,7 @@ export function summarizePerson(person: PersonContributionHistory): PeopleIndexE
     contributionsPrior12m: sumSince(person.contributions, dayOffset(730), dayOffset(366)),
     login: person.login,
     lookedUpAt: new Date().toISOString(),
+    months: buildMonthlySeries(person.contributions).map((month) => month.total),
     name: person.name,
     streak: currentStreak(person.contributions),
   };

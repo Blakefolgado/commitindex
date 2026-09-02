@@ -3358,10 +3358,30 @@ footer > span {
   }
 }
 
-.searched-people-table th:nth-child(n + 3),
-.searched-people-table td:nth-child(n + 3) {
+.searched-people-table th:nth-child(n + 4),
+.searched-people-table td:nth-child(n + 4) {
   font-variant-numeric: tabular-nums;
   text-align: right;
+}
+
+/* Whole-row link: the person cell's anchor is stretched over the row so the
+   row stays one real link rather than a JS click handler. */
+.searched-people-table tbody tr {
+  position: relative;
+}
+
+.searched-people-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.searched-people-table .leader-person::after {
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.searched-people-table .searched-people-trend {
+  width: 80px;
 }
 
 .searched-people-table .trend-up {

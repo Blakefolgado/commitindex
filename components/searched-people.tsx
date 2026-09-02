@@ -1,6 +1,36 @@
 import Link from "next/link";
 import { readPeopleIndex } from "@/lib/people-index";
 
+function Sparkline({ login, months }: { login: string; months: number[] }) {
+  if (months.length < 2) return null;
+  const maximum = Math.max(...months);
+  const minimum = Math.min(...months);
+  const range = Math.max(maximum - minimum, 1);
+  const points = months
+    .map((value, index) => {
+      const x = 2 + (index / (months.length - 1)) * 60;
+      const y = 19 - ((value - minimum) / range) * 16;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  const recent = months.slice(-6).reduce((sum, value) => sum + value, 0);
+  const previous = months.slice(-12, -6).reduce((sum, value) => sum + value, 0);
+  const direction = recent > previous ? "positive" : recent < previous ? "negative" : "neutral";
+
+  return (
+    <span
+      aria-label={`${login} monthly contributions over three years`}
+      className={`directory-trend ${direction}`}
+      role="img"
+    >
+      <svg viewBox="0 0 64 21" aria-hidden="true">
+        <polygon points={`2,20 ${points} 62,20`} />
+        <polyline points={points} />
+      </svg>
+    </span>
+  );
+}
+
 function acceleration(current: number, prior: number) {
   if (!prior) return null;
   return Math.round(((current - prior) / prior) * 100);
@@ -28,6 +58,7 @@ export async function SearchedPeople({ limit = 25 }: { limit?: number }) {
             <tr>
               <th>Rank</th>
               <th>Person</th>
+              <th>3 year trend</th>
               <th>Last 30 days</th>
               <th>Last 12 months</th>
               <th>Acceleration</th>
@@ -46,6 +77,9 @@ export async function SearchedPeople({ limit = 25 }: { limit?: number }) {
                       <img src={person.avatarUrl} alt="" width={30} height={30} />
                       <strong>@{person.login}</strong>
                     </Link>
+                  </td>
+                  <td className="searched-people-trend">
+                    <Sparkline login={person.login} months={person.months ?? []} />
                   </td>
                   <td>{person.contributions30d.toLocaleString()}</td>
                   <td>{person.contributions12m.toLocaleString()}</td>
