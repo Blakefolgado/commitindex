@@ -15,7 +15,9 @@ export async function SearchedPeople({ limit = 25 }: { limit?: number }) {
   if (!entries.length) return null;
 
   return (
-    <section className="leaderboard-panel searched-people">
+    <div className="searched-people-shell">
+      <h2>Recently searched</h2>
+      <section className="leaderboard-panel searched-people">
       <div className="people-table-actions">
         <span>Most recently searched profiles, ranked by the last 12 months</span>
         <Link className="primary-button" href="/people">Search a profile</Link>
@@ -57,6 +59,7 @@ export async function SearchedPeople({ limit = 25 }: { limit?: number }) {
           </tbody>
         </table>
       </div>
-    </section>
+      </section>
+    </div>
   );
 }
