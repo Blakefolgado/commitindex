@@ -1,0 +1,61 @@
+name: Refresh company data
+
+on:
+  schedule:
+    # 04:20 UTC daily, off the hour to avoid GitHub's busiest scheduling slots.
+    - cron: "20 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The generators read through the app's internal ingest endpoints, so the
+      # app has to be running. Built and started rather than dev for speed.
+      - name: Start the app
+        env:
+          GITHUB_TOKEN: ${{ secrets.COMMIT_INDEX_GITHUB_TOKEN || github.token }}
+          COMMIT_INDEX_INGEST_SECRET: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          pnpm exec next build
+          pnpm exec next start -p 3000 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:3000/ && break
+            sleep 2
+          done
+
+      - name: Refresh snapshots
+        env:
+          COMMIT_INDEX_INGEST_SECRET: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          node scripts/generate-leaderboard.mjs
+          node scripts/generate-organizations.mjs
+
+      - name: Commit any changes
+        run: |
+          git config user.name "commitindex-bot"
+          git config user.email "noreply@commitindex.com"
+          git add data/leaderboard.json data/organizations.json
+          git diff --cached --quiet && echo "No change" && exit 0
+          git commit -m "data: daily refresh"
+          git push
