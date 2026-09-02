@@ -14,7 +14,9 @@ export async function generateMetadata({
   const user = (await searchParams).user?.trim().replace(/^@/, "") ?? "";
   // File-convention opengraph-image.tsx would win over this, so the route
   // handler is the single generator for both the generic and per-person cards.
-  const image = user ? `/api/og/person?user=${encodeURIComponent(user)}` : "/api/og/person";
+  // ?v is bumped by hand when the card design changes: crawlers cache the
+  // image per URL, so a new design needs a new address to be picked up.
+  const image = user ? `/api/og/person?user=${encodeURIComponent(user)}&v=2` : "/api/og/person?v=2";
   const title = user
     ? `@${user}'s GitHub momentum through the AI era — Commit Index`
     : "All-time GitHub contribution graph with AI release dates — Commit Index";

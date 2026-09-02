@@ -1,14 +1,30 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import { getPersonContributionHistory } from "@/lib/github-person";
-import { buildMonthlySeries } from "@/lib/types";
+import {
+  readPeopleIndex,
+  summarizePerson,
+  type PeopleIndexEntry,
+} from "@/lib/people-index";
 
 export const runtime = "nodejs";
 
 const size = { width: 1200, height: 630 };
-const cacheHeaders = {
-  "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-};
+
+/**
+ * Crawlers (X in particular) are fussy about a chunked image response, so the
+ * PNG is buffered and served with an explicit Content-Length.
+ */
+async function png(element: React.ReactElement) {
+  const body = await new ImageResponse(element, size).arrayBuffer();
+  return new Response(body, {
+    headers: {
+      "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+      "Content-Length": String(body.byteLength),
+      "Content-Type": "image/png",
+    },
+  });
+}
 
 const fallbackYears = ["2022", "2023", "2024", "2025", "2026"];
 const fallbackReleases = [
@@ -148,16 +164,6 @@ function metric(label: string, value: string) {
   );
 }
 
-/** Consecutive active days ending at the most recent day, ignoring a still-empty today. */
-function currentStreak(contributions: Array<{ count: number; date: string }>) {
-  let streak = 0;
-  for (let index = contributions.length - 1; index >= 0; index -= 1) {
-    if (contributions[index].count > 0) streak += 1;
-    else if (index < contributions.length - 1) break;
-  }
-  return streak;
-}
-
 /**
  * Landmark releases worth naming on a share card. Kept deliberately short and
  * hand-picked: the full aiReleases list is far too dense to label at 1200px.
@@ -175,14 +181,8 @@ function logoUrl(domain: string) {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 }
 
-function personCard(person: {
-  avatarUrl: string;
-  login: string;
-  months: Array<{ start: string; total: number }>;
-  name: string;
-  streak: number;
-}) {
-  const { months } = person;
+function personCard(person: PeopleIndexEntry) {
+  const months = person.months.map((total) => ({ total }));
   const chart = { width: 1096, height: 196, inset: 10 };
   const maximum = Math.max(...months.map((month) => month.total), 1);
   const point = (index: number, total: number) => [
@@ -194,13 +194,25 @@ function personCard(person: {
   ];
   const points = months.map((month, index) => point(index, month.total).join(",")).join(" ");
   const areaPoints = `${chart.inset},${chart.height} ${points} ${chart.width - chart.inset},${chart.height}`;
-  const lastYearTotal = months.slice(-12).reduce((sum, month) => sum + month.total, 0);
-  const priorYearTotal = months.slice(-24, -12).reduce((sum, month) => sum + month.total, 0);
-  const change = priorYearTotal
-    ? Math.round(((lastYearTotal - priorYearTotal) / priorYearTotal) * 100)
+  const change = person.contributionsPrior12m
+    ? Math.round(
+      ((person.contributions12m - person.contributionsPrior12m)
+        / person.contributionsPrior12m) * 100,
+    )
     : null;
   const [peakX, peakY] = point(months.length - 1, months.at(-1)?.total ?? 0);
-  const monthIndex = (date: string) => months.findIndex((month) => month.start.slice(0, 7) === date.slice(0, 7));
+  // Months are the trailing 36 whole months, so a release date maps to an index
+  // by counting back from the most recent of them.
+  const lastMonth = new Date();
+  lastMonth.setUTCDate(1);
+  lastMonth.setUTCMonth(lastMonth.getUTCMonth() - 1);
+  const monthIndex = (date: string) => {
+    const target = new Date(`${date.slice(0, 7)}-01T00:00:00Z`);
+    const back = (lastMonth.getUTCFullYear() - target.getUTCFullYear()) * 12
+      + (lastMonth.getUTCMonth() - target.getUTCMonth());
+    const index = months.length - 1 - back;
+    return index >= 0 && index < months.length ? index : -1;
+  };
   // Alternate rows so neighbouring labels cannot overlap at this width.
   const visibleMilestones = milestones
     .map((milestone) => ({ ...milestone, index: monthIndex(milestone.date) }))
@@ -252,7 +264,7 @@ function personCard(person: {
       </div>
 
       <div style={{ display: "flex", gap: 64, marginTop: 22 }}>
-        {metric("Last 12 months", lastYearTotal.toLocaleString())}
+        {metric("Last 12 months", person.contributions12m.toLocaleString())}
         {metric(
           "Year on year",
           change === null ? "—" : `${change >= 0 ? "+" : ""}${change}%`,
@@ -325,26 +337,20 @@ function personCard(person: {
 }
 
 export async function GET(request: NextRequest) {
-  const username = request.nextUrl.searchParams.get("user")?.trim();
-  if (!username) {
-    return new ImageResponse(genericCard(), { ...size, headers: cacheHeaders });
-  }
+  const username = request.nextUrl.searchParams.get("user")?.trim().replace(/^@/, "");
+  if (!username) return png(genericCard());
 
   try {
-    const person = await getPersonContributionHistory(username);
-    const months = buildMonthlySeries(person.contributions);
-    if (!months.length) throw new Error("no contribution months");
-    return new ImageResponse(
-      personCard({
-        avatarUrl: person.avatarUrl,
-        login: person.login,
-        months,
-        name: person.name,
-        streak: currentStreak(person.contributions),
-      }),
-      { ...size, headers: cacheHeaders },
-    );
+    // Everyone searched on /people is already summarised in the index, so the
+    // usual crawl costs one blob read rather than a full GitHub history walk.
+    const index = await readPeopleIndex();
+    const saved = index.find((entry) => (
+      entry.login.toLowerCase() === username.toLowerCase() && entry.months?.length
+    ));
+    const person = saved ?? summarizePerson(await getPersonContributionHistory(username));
+    if (!person.months.length) throw new Error("no contribution months");
+    return png(personCard(person));
   } catch {
-    return new ImageResponse(genericCard(), { ...size, headers: cacheHeaders });
+    return png(genericCard());
   }
 }
