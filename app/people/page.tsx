@@ -16,7 +16,7 @@ export async function generateMetadata({
   // handler is the single generator for both the generic and per-person cards.
   // ?v is bumped by hand when the card design changes: crawlers cache the
   // image per URL, so a new design needs a new address to be picked up.
-  const image = user ? `/api/og/person?user=${encodeURIComponent(user)}&v=2` : "/api/og/person?v=2";
+  const image = user ? `/api/og/person?user=${encodeURIComponent(user)}&v=3` : "/api/og/person?v=3";
   const title = user
     ? `@${user}'s GitHub momentum through the AI era — Commit Index`
     : "All-time GitHub contribution graph with AI release dates — Commit Index";

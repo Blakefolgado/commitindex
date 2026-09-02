@@ -183,7 +183,7 @@ function logoUrl(domain: string) {
 
 function personCard(person: PeopleIndexEntry) {
   const months = person.months.map((total) => ({ total }));
-  const chart = { width: 1096, height: 196, inset: 10 };
+  const chart = { width: 1096, height: 244, inset: 10 };
   const maximum = Math.max(...months.map((month) => month.total), 1);
   const point = (index: number, total: number) => [
     Math.round(
@@ -232,38 +232,38 @@ function personCard(person: PeopleIndexEntry) {
         flexDirection: "column",
         fontFamily: "Arial, sans-serif",
         height: "100%",
-        padding: "40px 52px 32px",
+        // X lays its own title bar over the bottom of the card, so the chart
+        // stops well short of the edge rather than being half covered.
+        padding: "38px 52px 96px",
         width: "100%",
       }}
     >
       <div style={{ alignItems: "center", display: "flex", justifyContent: "space-between" }}>
         <Wordmark />
-        <span style={{ color: "#8b949e", fontSize: 19 }}>commitindex.com/people</span>
-      </div>
-
-      <div style={{ alignItems: "center", display: "flex", gap: 26, marginTop: 26 }}>
-        <img
-          alt=""
-          height={132}
-          src={person.avatarUrl}
-          style={{
-            border: "3px solid #39d353",
-            borderRadius: 66,
-            height: 132,
-            objectFit: "cover",
-            width: 132,
-          }}
-          width={132}
-        />
-        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <span style={{ fontSize: 50, fontWeight: 700, letterSpacing: "-1.9px", lineHeight: 1.05 }}>
-            {person.name}
-          </span>
-          <span style={{ color: "#8b949e", fontSize: 27 }}>@{person.login}</span>
+        <div style={{ alignItems: "center", display: "flex", gap: 18 }}>
+          <div style={{ alignItems: "flex-end", display: "flex", flexDirection: "column", gap: 1 }}>
+            <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-1.2px", lineHeight: 1.1 }}>
+              {person.name}
+            </span>
+            <span style={{ color: "#8b949e", fontSize: 21 }}>@{person.login}</span>
+          </div>
+          <img
+            alt=""
+            height={82}
+            src={person.avatarUrl}
+            style={{
+              border: "3px solid #39d353",
+              borderRadius: 41,
+              height: 82,
+              objectFit: "cover",
+              width: 82,
+            }}
+            width={82}
+          />
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 64, marginTop: 22 }}>
+      <div style={{ display: "flex", gap: 64, marginTop: 20 }}>
         {metric("Last 12 months", person.contributions12m.toLocaleString())}
         {metric(
           "Year on year",
@@ -276,7 +276,7 @@ function personCard(person: PeopleIndexEntry) {
         style={{
           display: "flex",
           flexGrow: 1,
-          marginTop: 14,
+          marginTop: 16,
           position: "relative",
           width: "100%",
         }}
