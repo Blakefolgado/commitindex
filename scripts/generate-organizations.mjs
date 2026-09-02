@@ -13,6 +13,11 @@ const requestedBatchSize = Number.parseInt(
   process.env.COMMIT_INDEX_BATCH_SIZE || "",
   10,
 );
+const onlyOrgs = (process.env.COMMIT_INDEX_ONLY || "")
+  .split(",")
+  .map((value) => value.trim().toLowerCase())
+  .filter(Boolean);
+
 
 let previousEntries = [];
 if (incremental) {
@@ -28,9 +33,14 @@ const previousByOrg = new Map(
 );
 const organizations = leaderboard.entries.map((entry) => entry.org);
 const missing = organizations.filter((org) => !previousByOrg.has(org.toLowerCase()));
-const pending = Number.isFinite(requestedBatchSize) && requestedBatchSize > 0
-  ? missing.slice(0, requestedBatchSize)
+// COMMIT_INDEX_ONLY=org[,org] refreshes just those, for adding one company
+// without re-fetching every other one that is missing from the snapshot.
+const selected = onlyOrgs.length
+  ? missing.filter((org) => onlyOrgs.includes(org.toLowerCase()))
   : missing;
+const pending = Number.isFinite(requestedBatchSize) && requestedBatchSize > 0
+  ? selected.slice(0, requestedBatchSize)
+  : selected;
 const entries = organizations
   .map((org) => previousByOrg.get(org.toLowerCase()))
   .filter(Boolean);

@@ -10,6 +10,11 @@ const incremental = process.env.COMMIT_INDEX_INCREMENTAL === "1";
 const snapshotUrl = new URL("../data/leaderboard.json", import.meta.url);
 const failures = [];
 const requestedBatchSize = Number.parseInt(process.env.COMMIT_INDEX_BATCH_SIZE || "", 10);
+const onlyOrgs = (process.env.COMMIT_INDEX_ONLY || "")
+  .split(",")
+  .map((value) => value.trim().toLowerCase())
+  .filter(Boolean);
+
 const requestedWorkers = Number.parseInt(process.env.COMMIT_INDEX_WORKERS || "2", 10);
 const workerCount = Math.max(1, Math.min(Number.isFinite(requestedWorkers) ? requestedWorkers : 2, 4));
 
@@ -87,9 +92,14 @@ const missing = companies.filter((company) => {
   entries.push({ ...previous, ...company });
   return false;
 });
-const pending = Number.isFinite(requestedBatchSize) && requestedBatchSize > 0
-  ? missing.slice(0, requestedBatchSize)
+// COMMIT_INDEX_ONLY=org[,org] refreshes just those, for adding one company
+// without re-fetching every other one that is missing from the snapshot.
+const selected = onlyOrgs.length
+  ? missing.filter((company) => onlyOrgs.includes(company.org.toLowerCase()))
   : missing;
+const pending = Number.isFinite(requestedBatchSize) && requestedBatchSize > 0
+  ? selected.slice(0, requestedBatchSize)
+  : selected;
 if (incremental) {
   console.log(`Reusing ${entries.length} existing entries; fetching ${pending.length} of ${missing.length} missing companies.`);
 }
