@@ -78,7 +78,10 @@ for (const [index, org] of pending.entries()) {
     entries.push(await load(org));
     console.log(`${index + 1}/${pending.length} ${org}`);
   } catch (error) {
-    failures.push(org);
+    // A refresh that gets rate limited keeps the profile we already have.
+    const fallback = previousByOrg.get(org.toLowerCase());
+    if (fallback) entries.push(fallback);
+    else failures.push(org);
     console.error(`Skipped ${org}: ${error.message}`);
   }
 }

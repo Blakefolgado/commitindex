@@ -116,7 +116,14 @@ async function worker() {
     const company = pending[cursor];
     cursor += 1;
     const entry = await load(company);
+    // A refresh that gets rate limited should keep the numbers we already have
+    // rather than dropping the company or failing the whole run.
+    const fallback = previousByOrg.get(company.org.toLowerCase());
     if (entry) entries.push(entry);
+    else if (fallback) {
+      entries.push({ ...fallback, ...company });
+      failures.splice(failures.indexOf(company.org), 1);
+    }
     console.log(`${entries.length}/${companies.length} ${company.org}`);
   }
 }
