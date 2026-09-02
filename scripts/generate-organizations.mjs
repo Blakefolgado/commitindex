@@ -13,6 +13,13 @@ const requestedBatchSize = Number.parseInt(
   process.env.COMMIT_INDEX_BATCH_SIZE || "",
   10,
 );
+const shard = (process.env.COMMIT_INDEX_SHARD || "").match(/^(\d+)\/(\d+)$/);
+// COMMIT_INDEX_SHARD=i/n refreshes the i-th of n slices of the list even when
+// those entries already exist. Three slices a day keeps every company under a
+// day old while staying inside GitHub's hourly request limit.
+function inShard(index) {
+  return shard ? index % Number(shard[2]) === Number(shard[1]) : false;
+}
 const onlyOrgs = (process.env.COMMIT_INDEX_ONLY || "")
   .split(",")
   .map((value) => value.trim().toLowerCase())
@@ -32,7 +39,7 @@ const previousByOrg = new Map(
   previousEntries.map((entry) => [entry.org.toLowerCase(), entry]),
 );
 const organizations = leaderboard.entries.map((entry) => entry.org);
-const missing = organizations.filter((org) => !previousByOrg.has(org.toLowerCase()));
+const missing = organizations.filter((org, index) => !previousByOrg.has(org.toLowerCase()) || inShard(index));
 // COMMIT_INDEX_ONLY=org[,org] refreshes just those, for adding one company
 // without re-fetching every other one that is missing from the snapshot.
 const selected = onlyOrgs.length

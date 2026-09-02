@@ -2,9 +2,19 @@ name: Refresh company data
 
 on:
   schedule:
-    # 04:20 UTC daily, off the hour to avoid GitHub's busiest scheduling slots.
-    - cron: "20 4 * * *"
+    # A third of the companies at a time. The built-in Actions token allows
+    # 1,000 GitHub requests an hour and a full sweep of 168 companies needs
+    # roughly double that, so the list is refreshed in three passes spread
+    # across the day. Every company still gets refreshed daily.
+    - cron: "20 2 * * *"
+    - cron: "20 10 * * *"
+    - cron: "20 18 * * *"
   workflow_dispatch:
+    inputs:
+      shard:
+        description: "Slice to refresh, as i/n (blank refreshes only missing companies)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -43,8 +53,20 @@ jobs:
             sleep 2
           done
 
+      - name: Pick the slice for this run
+        id: slice
+        run: |
+          case "${{ github.event.schedule }}" in
+            "20 2 * * *")  echo "shard=0/3" >> "$GITHUB_OUTPUT" ;;
+            "20 10 * * *") echo "shard=1/3" >> "$GITHUB_OUTPUT" ;;
+            "20 18 * * *") echo "shard=2/3" >> "$GITHUB_OUTPUT" ;;
+            *)             echo "shard=${{ github.event.inputs.shard }}" >> "$GITHUB_OUTPUT" ;;
+          esac
+
       - name: Refresh snapshots
         env:
+          COMMIT_INDEX_INCREMENTAL: "1"
+          COMMIT_INDEX_SHARD: ${{ steps.slice.outputs.shard }}
           COMMIT_INDEX_INGEST_SECRET: ${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           node scripts/generate-leaderboard.mjs

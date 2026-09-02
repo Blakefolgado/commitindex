@@ -10,6 +10,13 @@ const incremental = process.env.COMMIT_INDEX_INCREMENTAL === "1";
 const snapshotUrl = new URL("../data/leaderboard.json", import.meta.url);
 const failures = [];
 const requestedBatchSize = Number.parseInt(process.env.COMMIT_INDEX_BATCH_SIZE || "", 10);
+const shard = (process.env.COMMIT_INDEX_SHARD || "").match(/^(\d+)\/(\d+)$/);
+// COMMIT_INDEX_SHARD=i/n refreshes the i-th of n slices of the list even when
+// those entries already exist. Three slices a day keeps every company under a
+// day old while staying inside GitHub's hourly request limit.
+function inShard(index) {
+  return shard ? index % Number(shard[2]) === Number(shard[1]) : false;
+}
 const onlyOrgs = (process.env.COMMIT_INDEX_ONLY || "")
   .split(",")
   .map((value) => value.trim().toLowerCase())
@@ -86,9 +93,9 @@ const previousEntries = incremental
   : [];
 const previousByOrg = new Map(previousEntries.map((entry) => [entry.org.toLowerCase(), entry]));
 const entries = [];
-const missing = companies.filter((company) => {
+const missing = companies.filter((company, index) => {
   const previous = previousByOrg.get(company.org.toLowerCase());
-  if (!previous) return true;
+  if (!previous || inShard(index)) return true;
   entries.push({ ...previous, ...company });
   return false;
 });
