@@ -224,7 +224,7 @@ function personCard(person: {
         }}
       >
         <span style={{ color: "#8b949e", fontSize: 15, left: 22, position: "absolute", top: 16 }}>
-          Contributions per month, last 5 years
+          Contributions per month, last 3 years
         </span>
         <svg
           height={chart.height}

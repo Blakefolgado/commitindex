@@ -152,7 +152,7 @@ export type PeopleLeaderboardSnapshot = {
 };
 
 // Shared by the on-page momentum chart and the /api/og/person share image so
-// both render the same window: whole months only, last five years.
+// both render the same window: whole months only, last three years.
 export function buildMonthlySeries(contributions: PersonContributionDay[]) {
   const months = new Map<string, number>();
   contributions.forEach((day) => {
@@ -168,5 +168,5 @@ export function buildMonthlySeries(contributions: PersonContributionDay[]) {
   const complete = series.length > 1 && series.at(-1)!.start === currentMonth
     ? series.slice(0, -1)
     : series;
-  return complete.slice(-60);
+  return complete.slice(-36);
 }
