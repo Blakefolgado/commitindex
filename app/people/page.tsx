@@ -56,11 +56,11 @@ export default async function PeoplePage({
   }
 
   return (
-    <>
-      <Suspense fallback={null}>
-        <PeopleExplorer initialUsername={params.user?.trim() || ""} />
-      </Suspense>
-      <SearchedPeople />
-    </>
+    <Suspense fallback={null}>
+      <PeopleExplorer
+        initialUsername={params.user?.trim() || ""}
+        leaderboard={<SearchedPeople />}
+      />
+    </Suspense>
   );
 }

@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
   type TouchEvent,
   type WheelEvent as ReactWheelEvent,
 } from "react";
@@ -570,8 +571,11 @@ function WeeklyMomentumChart({
 
 export function PeopleExplorer({
   initialUsername,
+  leaderboard,
 }: {
   initialUsername: string;
+  /** Server-rendered leaderboard, placed inline so it stays reachable. */
+  leaderboard?: ReactNode;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -665,6 +669,8 @@ export function PeopleExplorer({
       )}
       {!loading && error && <div className="people-explorer-status error" role="alert">{error}</div>}
 
+      {!loading && !data && leaderboard}
+
       {!loading && data && (
         <>
           <section className="people-profile-summary" aria-label={`${data.name} contribution summary`}>
@@ -683,6 +689,8 @@ export function PeopleExplorer({
               releases={releases}
             />
           </section>
+
+          {leaderboard}
 
           <details className="people-release-list" open>
             <summary>

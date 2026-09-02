@@ -3341,21 +3341,13 @@ footer > span {
 }
 
 .searched-people-shell {
-  margin: 0 auto;
-  max-width: 1050px;
-  padding: 0 28px 72px;
+  margin-top: 26px;
 }
 
 .searched-people-shell h2 {
   font-size: 20px;
   letter-spacing: -0.02em;
   margin: 0 0 14px;
-}
-
-@media (max-width: 720px) {
-  .searched-people-shell {
-    padding: 0 18px 56px;
-  }
 }
 
 .searched-people-table th:nth-child(n + 4),
