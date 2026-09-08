@@ -3356,6 +3356,10 @@ footer > span {
   text-align: right;
 }
 
+.searched-people-table {
+  min-width: 900px;
+}
+
 /* Whole-row link: the person cell's anchor is stretched over the row so the
    row stays one real link rather than a JS click handler. */
 .searched-people-table tbody tr {
