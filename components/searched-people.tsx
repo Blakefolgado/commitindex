@@ -39,6 +39,10 @@ function Sparkline({
 
 const recentlySearched = (recentlySearchedData as { entries: PersonSummary[] }).entries;
 
+function reposLabel(count: number) {
+  return `${count.toLocaleString()} ${count === 1 ? "repo" : "repos"}`;
+}
+
 /**
  * One durable list containing recovered profile searches and repository contributors.
  * Both sources are checked into the repository, so a provider quota cannot blank it.
@@ -75,7 +79,6 @@ export function SearchedPeople({ limit = 25 }: { limit?: number }) {
                 <th>Company</th>
                 <th>Activity trend</th>
                 <th>Activity</th>
-                <th>Repos</th>
               </tr>
             </thead>
             <tbody>
@@ -117,10 +120,13 @@ export function SearchedPeople({ limit = 25 }: { limit?: number }) {
                     </td>
                     <td>
                       {profile
-                        ? `${profile.contributions12m.toLocaleString()} contributions`
-                        : `${companyPerson!.commits.toLocaleString()} commits`}
+                        ? `${profile.contributions12m.toLocaleString()} contributions${
+                          companyPerson ? ` · ${reposLabel(companyPerson.repositories)}` : ""
+                        }`
+                        : `${companyPerson!.commits.toLocaleString()} commits · ${
+                          reposLabel(companyPerson!.repositories)
+                        }`}
                     </td>
-                    <td>{companyPerson?.repositories.toLocaleString() ?? "—"}</td>
                   </tr>
                 );
               })}
