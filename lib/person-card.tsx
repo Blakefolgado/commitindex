@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import type { PeopleIndexEntry } from "@/lib/people-index";
+import type { PersonSummary } from "@/lib/person-summary";
 
 const size = { width: 1200, height: 630 };
 
@@ -20,7 +20,7 @@ export function renderGenericCard() {
   return render(genericCard());
 }
 
-export function renderPersonCard(person: PeopleIndexEntry) {
+export function renderPersonCard(person: PersonSummary) {
   return render(personCard(person));
 }
 
@@ -179,7 +179,7 @@ function logoUrl(domain: string) {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
 }
 
-function personCard(person: PeopleIndexEntry) {
+function personCard(person: PersonSummary) {
   const months = person.months.map((total) => ({ total }));
   const chart = { width: 1096, height: 244, inset: 10 };
   const maximum = Math.max(...months.map((month) => month.total), 1);
@@ -333,4 +333,3 @@ function personCard(person: PeopleIndexEntry) {
     </div>
   );
 }
-

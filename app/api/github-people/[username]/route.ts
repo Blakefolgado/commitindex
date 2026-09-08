@@ -5,7 +5,6 @@ import {
   GitHubPersonError,
   personCacheTag,
 } from "@/lib/github-person";
-import { recordPerson } from "@/lib/people-index";
 
 export const runtime = "nodejs";
 
@@ -24,9 +23,6 @@ export async function GET(
 
   try {
     const person = await getPersonContributionHistory(username);
-    // Indexing is a side effect of someone looking a profile up; never let a
-    // storage hiccup turn a successful lookup into an error page.
-    await recordPerson(person).catch(() => {});
     return NextResponse.json(person, {
       headers: {
         // The GitHub reads behind this are cached by tag, so the response
