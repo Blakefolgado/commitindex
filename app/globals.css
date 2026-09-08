@@ -3391,6 +3391,11 @@ footer > span {
   z-index: 1;
 }
 
+.searched-people-table .person-company {
+  position: relative;
+  z-index: 1;
+}
+
 .compare-people-chart {
   display: block;
   height: auto;
@@ -3419,7 +3424,7 @@ footer > span {
   text-overflow: clip;
 }
 
-.searched-people-table th:nth-child(3),
-.searched-people-table td:nth-child(3) {
+.searched-people-table th:nth-child(2),
+.searched-people-table td:nth-child(2) {
   min-width: 210px;
 }
