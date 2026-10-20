@@ -17,6 +17,7 @@
   },
   "env": {
     "production": {
+      "preview_urls": false,
       "routes": [
         { "pattern": "commitindex.com/*", "zone_name": "commitindex.com" },
         { "pattern": "www.commitindex.com/*", "zone_name": "commitindex.com" }
