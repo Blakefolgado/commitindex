@@ -9,3 +9,6 @@ playwright-report
 test-results
 .env*.local
 *.tsbuildinfo
+/dist/
+.vinext/
+.wrangler/

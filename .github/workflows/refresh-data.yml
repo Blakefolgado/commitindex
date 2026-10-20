@@ -73,6 +73,7 @@ jobs:
           node scripts/generate-organizations.mjs
 
       - name: Commit any changes
+        id: commit
         run: |
           git config user.name "commitindex-bot"
           git config user.email "noreply@commitindex.com"
@@ -80,3 +81,14 @@ jobs:
           git diff --cached --quiet && echo "No change" && exit 0
           git commit -m "data: daily refresh"
           git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Cloudflare
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          CLOUDFLARE_ENV: production
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          pnpm build:vinext
+          npx wrangler@4.151.3 deploy --config dist/server/wrangler.json

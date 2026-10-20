@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "commitindex-web",
+  "account_id": "87086c64283b9bfb51d6e1b2a1190202",
+  "compatibility_date": "2026-10-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "vinext/server/fetch-handler",
+  "workers_dev": false,
+  "preview_urls": true,
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "assets": {
+    "directory": "dist/client",
+    "html_handling": "none",
+    "not_found_handling": "none",
+    "binding": "ASSETS",
+    "run_worker_first": ["/*", "!/_next/static/*", "!/*/_next/static/*"]
+  },
+  "env": {
+    "production": {
+      "routes": [
+        { "pattern": "commitindex.com/*", "zone_name": "commitindex.com" },
+        { "pattern": "www.commitindex.com/*", "zone_name": "commitindex.com" }
+      ],
+      "vars": { "APP_ENV": "production" },
+      "tail_consumers": [{ "service": "humanleap-tail-production" }]
+    }
+  }
+}

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Newsreader } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { VercelAnalytics } from "@/components/vercel-analytics";
 import "./globals.css";
 
 const geist = Geist({
@@ -78,7 +77,6 @@ export default function RootLayout({
         <SiteHeader />
         {children}
         <SiteFooter />
-        <VercelAnalytics />
       </body>
     </html>
   );
