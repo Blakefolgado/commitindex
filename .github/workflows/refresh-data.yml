@@ -91,4 +91,4 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           pnpm build:vinext
-          npx wrangler@4.151.3 deploy --config dist/server/wrangler.json
+          pnpm exec wrangler deploy --config dist/server/wrangler.json
